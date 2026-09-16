@@ -28,7 +28,7 @@ export async function sendEmail(data: z.infer<typeof formSchema>) {
 
   const resend = new Resend(process.env.RESEND_API_KEY);
 
-  const targetEmail = process.env.CONTACT_EMAIL || "hello@luminadigital.it";
+  const targetEmail = process.env.CONTACT_EMAIL || "psi.padalino@gmail.com";
 
   try {
     await resend.emails.send({

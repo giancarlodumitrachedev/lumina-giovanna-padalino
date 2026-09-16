@@ -6,8 +6,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 const SESSION_COOKIE = "lumina_admin_session";
-const DEFAULT_ADMIN_EMAIL = "info@giovannapadalino.it";
+const DEFAULT_ADMIN_EMAIL = "psi.padalino@gmail.com";
 const DEFAULT_ADMIN_PASS = process.env.ADMIN_PASSWORD || "giovanna2026";
+const SESSION_MAX_AGE = 60 * 60 * 24 * 30; // 30 giorni di permanenza sessione
 
 function slugify(text: string): string {
   return text
@@ -15,15 +16,12 @@ function slugify(text: string): string {
     .toLowerCase()
     .trim()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "") // rimuove accenti
-    .replace(/[^a-z0-9\s-]/g, "") // rimuove caratteri non alfanumerici
-    .replace(/[\s_-]+/g, "-") // sostituisce spazi e trattini
-    .replace(/^-+|-+$/g, ""); // rimuove trattini all'inizio e alla fine
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/[\s_-]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
-/**
- * Autenticazione Dott.ssa Giovanna Padalino per il portale
- */
 export async function loginAdminAction(prevState: any, formData: FormData) {
   const email = formData.get("email")?.toString().trim();
   const password = formData.get("password")?.toString().trim();
@@ -32,7 +30,7 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
     return { success: false, error: "Inserisci email e password." };
   }
 
-  // 1. Prova autenticazione Supabase Auth
+  // 1. Autenticazione Supabase Auth (se l'utente è registrato su Supabase)
   try {
     const supabase = createServerClient();
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -47,7 +45,7 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/",
-        maxAge: 60 * 60 * 24 * 7, // 7 giorni
+        maxAge: SESSION_MAX_AGE,
       });
       redirect("/admin");
     }
@@ -55,18 +53,22 @@ export async function loginAdminAction(prevState: any, formData: FormData) {
     if (err?.message?.includes("NEXT_REDIRECT")) throw err;
   }
 
-  // 2. Controllo credenziali cliniche predefinite
-  if (
-    (email.toLowerCase() === DEFAULT_ADMIN_EMAIL.toLowerCase() || email.toLowerCase() === "giovanna.padalino@gmail.com" || email.toLowerCase() === "admin@giovannapadalino.it") &&
-    password === DEFAULT_ADMIN_PASS
-  ) {
+  // 2. Controllo credenziali cliniche autorizzate
+  const allowedEmails = [
+    DEFAULT_ADMIN_EMAIL.toLowerCase(),
+    "info@giovannapadalino.it",
+    "giovanna.padalino@gmail.com",
+    "admin@giovannapadalino.it",
+  ];
+
+  if (allowedEmails.includes(email.toLowerCase()) && password === DEFAULT_ADMIN_PASS) {
     const cookieStore = await cookies();
     cookieStore.set(SESSION_COOKIE, JSON.stringify({ email, role: "admin" }), {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7,
+      maxAge: SESSION_MAX_AGE,
     });
     redirect("/admin");
   }

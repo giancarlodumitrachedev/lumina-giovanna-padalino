@@ -17,9 +17,10 @@ function SmartLinkInner({ children, href, className, onClick, target, rel, ...pr
   const searchParams = useSearchParams();
   
   let finalHref = typeof href === "string" ? href : href.toString();
-  if (typeof href === "string" && searchParams && searchParams.toString()) {
-    const separator = href.includes("?") ? "&" : "?";
-    finalHref = `${href}${separator}${searchParams.toString()}`;
+  if (typeof href === "string" && href.startsWith("/") && !href.startsWith("//") && searchParams && searchParams.toString()) {
+    const [pathPart, hashPart] = href.split("#");
+    const separator = pathPart.includes("?") ? "&" : "?";
+    finalHref = `${pathPart}${separator}${searchParams.toString()}${hashPart ? `#${hashPart}` : ""}`;
   }
 
   return (

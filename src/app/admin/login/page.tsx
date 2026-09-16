@@ -65,8 +65,8 @@ export default function AdminLoginPage() {
                   type="email"
                   name="email"
                   required
-                  placeholder="info@giovannapadalino.it"
-                  defaultValue="info@giovannapadalino.it"
+                  placeholder="psi.padalino@gmail.com"
+                  defaultValue="psi.padalino@gmail.com"
                   className="block w-full pl-10 pr-3.5 py-3 border border-[#DFCEBA] rounded-xl text-sm bg-[#FAF6F0] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30 focus:border-[#C85A32] text-[#2C1E16]"
                 />
               </div>
