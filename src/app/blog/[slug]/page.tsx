@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { blogPosts, BlogPost } from "@/lib/blog-data";
+import { getPostBySlug, getPublishedPosts } from "@/lib/blog-service";
 import { SmartLink } from "@/components/smart-link";
 import { ArrowLeft, Clock, Calendar, MessageCircle, Calendar as CalendarIcon, Sparkles } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/instagram-icon";
@@ -12,14 +12,15 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  return blogPosts.map((post) => ({
+  const posts = await getPublishedPosts();
+  return posts.map((post) => ({
     slug: post.slug,
   }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getPostBySlug(slug);
   if (!post) return { title: "Articolo non trovato | Dott.ssa Giovanna Padalino" };
 
   return {
@@ -36,15 +37,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = blogPosts.find((p) => p.slug === slug);
+  const post = await getPostBySlug(slug);
 
   if (!post) {
     notFound();
   }
 
-  const relatedPosts = blogPosts
+  const allPosts = await getPublishedPosts();
+  const relatedPosts = allPosts
     .filter((p) => p.slug !== post.slug)
     .slice(0, 2);
+
 
   // Schema.org Article JSON-LD for rich SEO
   const jsonLd = {
@@ -67,10 +70,10 @@ export default async function BlogPostPage({ params }: Props) {
   };
 
   return (
-    <article className="py-16 md:py-24 bg-[#F5EBE1] min-h-screen relative overflow-hidden">
+    <article className="pt-24 sm:pt-28 md:pt-32 pb-16 md:pb-24 bg-[#F5EBE1] min-h-screen relative overflow-hidden">
       {/* Decorative foliage */}
       <div className="absolute top-0 right-0 translate-x-6 -translate-y-6 pointer-events-none z-0">
-        <AutumnBranch className="w-48 h-56 opacity-65" flipped />
+        <AutumnBranch className="w-36 sm:w-48 h-44 sm:h-56 opacity-50 sm:opacity-65" flipped />
       </div>
 
       <script
@@ -78,9 +81,9 @@ export default async function BlogPostPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      <div className="max-w-4xl mx-auto px-6 relative z-10">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Back Link */}
-        <div className="mb-8">
+        <div className="mb-6 sm:mb-8">
           <SmartLink
             href="/blog"
             className="inline-flex items-center gap-2 text-xs font-semibold text-[#8C6D58] hover:text-primary transition-colors"
@@ -91,33 +94,33 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
 
         {/* Article Header */}
-        <header className="mb-12">
-          <div className="flex flex-wrap items-center gap-3 mb-6">
-            <span className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#EADBCB] text-[#C85A32] border border-[#DFCEBA]">
+        <header className="mb-8 sm:mb-12">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 mb-4 sm:mb-6">
+            <span className="px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EADBCB] text-[#C85A32] border border-[#DFCEBA]">
               {post.category}
             </span>
-            <span className="flex items-center gap-1.5 text-xs text-[#8C6D58]">
+            <span className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#8C6D58]">
               <Clock className="w-3.5 h-3.5" />
               {post.readTime}
             </span>
             <span className="text-[#DFCEBA]">•</span>
-            <span className="flex items-center gap-1.5 text-xs text-[#8C6D58]">
+            <span className="flex items-center gap-1.5 text-[11px] sm:text-xs text-[#8C6D58]">
               <Calendar className="w-3.5 h-3.5" />
               {post.date}
             </span>
           </div>
 
-          <h1 className="text-3xl md:text-5xl font-heading font-bold text-[#2C1E16] leading-tight mb-6">
+          <h1 className="text-2xl sm:text-3xl md:text-5xl font-heading font-bold text-[#2C1E16] leading-tight mb-4 sm:mb-6">
             {post.title}
           </h1>
 
-          <p className="text-lg md:text-xl text-[#5C2A14] font-heading italic leading-relaxed border-l-4 border-[#D4AF37] pl-5 py-2 bg-white/60 rounded-r-xl border border-r-0 border-y-0">
+          <p className="text-base sm:text-lg md:text-xl text-[#5C2A14] font-heading italic leading-relaxed border-l-4 border-[#D4AF37] pl-4 sm:pl-5 py-2 bg-white/60 rounded-r-xl border border-r-0 border-y-0">
             {post.excerpt}
           </p>
         </header>
 
         {/* Article Body */}
-        <div className="bg-white/95 rounded-3xl p-8 md:p-14 shadow-sm border border-[#DFCEBA] mb-14 space-y-6 text-[#3A281E] leading-relaxed text-base md:text-lg">
+        <div className="bg-white/95 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-14 shadow-xs sm:shadow-sm border border-[#DFCEBA] mb-10 sm:mb-14 space-y-5 sm:space-y-6 text-[#3A281E] leading-relaxed text-sm sm:text-base md:text-lg">
           {post.content.map((paragraph, index) => (
             <p key={index} className="leading-relaxed">
               {paragraph}

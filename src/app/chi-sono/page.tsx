@@ -19,26 +19,26 @@ export default async function ChiSonoPage({
   const params = await getDemoParams(searchParams);
 
   return (
-    <div className="py-16 md:py-24 bg-[#F5EBE1] min-h-screen relative overflow-hidden">
+    <div className="pt-24 sm:pt-28 md:pt-32 pb-16 md:pb-24 bg-[#F5EBE1] min-h-screen relative overflow-hidden">
       {/* Decorative Autumn foliage */}
       <div className="absolute top-0 left-0 -translate-x-6 -translate-y-4 pointer-events-none z-0">
-        <AutumnBranch className="w-40 h-48 opacity-65" />
+        <AutumnBranch className="w-32 sm:w-40 h-40 sm:h-48 opacity-50 sm:opacity-65" />
       </div>
       <div className="absolute top-1/3 right-0 translate-x-6 pointer-events-none z-0">
-        <AutumnBranch className="w-44 h-52 opacity-55" flipped />
+        <AutumnBranch className="w-36 sm:w-44 h-44 sm:h-52 opacity-40 sm:opacity-55" flipped />
       </div>
 
-      <div className="max-w-6xl mx-auto px-6 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Header Title & Subtitle */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-[#EADBCB] text-[#5C2A14] text-xs font-semibold mb-4 tracking-wide uppercase border border-[#DFCEBA]">
-            <Sparkles className="w-3.5 h-3.5 text-[#C59B27]" />
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-full bg-[#EADBCB] text-[#5C2A14] text-[11px] sm:text-xs font-semibold mb-3 sm:mb-4 tracking-wide uppercase border border-[#DFCEBA]">
+            <Sparkles className="w-3.5 h-3.5 text-[#C59B27] shrink-0" />
             <span>Biografia Professionale & Metodo</span>
           </div>
-          <h1 className="text-[#2C1E16] font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+          <h1 className="text-[#2C1E16] font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">
             Dott.ssa Giovanna V. Padalino
           </h1>
-          <p className="text-lg md:text-xl text-[#735948] font-heading italic">
+          <p className="text-base sm:text-lg md:text-xl text-[#735948] font-heading italic">
             Psicologa clinica, Pedagogista e Tecnico ABA
           </p>
           <p className="text-xs text-[#8C6D58] mt-2 tracking-wide font-sans">
@@ -47,7 +47,7 @@ export default async function ChiSonoPage({
         </div>
 
         {/* Profile Card & Bio Narrative */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-20">
           {/* Left Column: Authentic Photo (1.jpg) */}
           <div className="lg:col-span-5 relative">
             <div className="relative aspect-[3/4] w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white">

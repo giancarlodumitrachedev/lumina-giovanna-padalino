@@ -39,15 +39,16 @@ export function Header() {
           : "bg-[#F5EBE1]/85 backdrop-blur-sm h-20 md:h-24"
       }`}
     >
-      <div className="max-w-7xl mx-auto flex h-full items-center justify-between px-6 transition-all duration-300">
-        {/* Logo / Brand with Corsivo / Italic */}
-        <SmartLink href="/" className="flex items-center gap-3 group">
-          <div className="flex flex-col">
-            <span className="font-heading italic font-bold text-xl md:text-2xl tracking-tight text-[#2C1E16] group-hover:text-primary transition-colors">
+      <div className="max-w-7xl mx-auto flex h-full items-center justify-between px-3.5 sm:px-6 transition-all duration-300">
+        {/* Logo / Brand with Corsivo / Italic - Truncated & Scaled for Mobile */}
+        <SmartLink href="/" className="flex items-center gap-2 group min-w-0 pr-2">
+          <div className="flex flex-col min-w-0">
+            <span className="font-heading italic font-bold text-[17px] sm:text-xl md:text-2xl tracking-tight text-[#2C1E16] group-hover:text-primary transition-colors truncate">
               Dott.ssa Giovanna Padalino
             </span>
-            <span className="text-[11px] md:text-xs uppercase tracking-wider text-muted-foreground font-sans">
-              Psicologa Clinica & Pedagogista • Bologna
+            <span className="text-[10px] sm:text-[11px] md:text-xs uppercase tracking-wider text-muted-foreground font-sans truncate">
+              <span className="inline sm:hidden">Psicologa Clinica • Bologna</span>
+              <span className="hidden sm:inline">Psicologa Clinica & Pedagogista • Bologna</span>
             </span>
           </div>
         </SmartLink>
@@ -106,31 +107,23 @@ export function Header() {
           </SmartLink>
         </nav>
 
-        {/* Mobile Nav */}
-        <div className="md:hidden flex items-center gap-3">
-          <a
-            href="https://www.instagram.com/gvpadalino.psicologa/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="p-1.5 text-[#9E3E26] focus:outline-none"
-            aria-label="Instagram"
-          >
-            <InstagramIcon className="h-5 w-5" />
-          </a>
+        {/* Mobile Nav: Clean, Compact, Zero Overflow */}
+        <div className="md:hidden flex items-center gap-2 shrink-0">
           <a
             href="https://wa.me/393492679598?text=Gentile%20Dott.ssa%20Padalino,%20vorrei%20richiedere%20informazioni%20per%20un%20appuntamento."
             target="_blank"
             rel="noopener noreferrer"
-            className="p-1.5 text-emerald-600 focus:outline-none"
+            className="p-2 text-emerald-700 hover:text-emerald-800 bg-emerald-50/90 rounded-full border border-emerald-200/70 transition-colors focus:outline-none flex items-center justify-center"
             aria-label="WhatsApp"
+            title="Scrivi su WhatsApp"
           >
-            <MessageCircle className="h-6 w-6" />
+            <MessageCircle className="h-4.5 w-4.5 text-emerald-600" />
           </a>
           <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger
-              render={<button className="p-2 -mr-2 text-foreground focus:outline-none" aria-label="Menu" />}
+              render={<button className="p-2 -mr-1 text-[#2C1E16] hover:text-primary transition-colors focus:outline-none" aria-label="Menu" />}
             >
-              <Menu className="h-7 w-7" />
+              <Menu className="h-6 w-6" />
             </SheetTrigger>
             <SheetContent side="right" className="bg-[#F5EBE1] border-border w-full sm:w-[380px]">
               <SheetTitle className="sr-only">Menu di Navigazione</SheetTitle>
@@ -188,7 +181,7 @@ export function Header() {
                   <SmartLink
                     href="/contatti"
                     onClick={() => setOpen(false)}
-                    className="block bg-primary text-primary-foreground hover:bg-[#AF4621] px-6 py-3 rounded-xl text-center font-medium shadow-md w-full"
+                    className="block bg-primary text-primary-foreground hover:bg-[#AF4621] px-6 py-3.5 rounded-xl text-center font-medium shadow-md w-full"
                   >
                     Prenota un consulto
                   </SmartLink>
@@ -197,6 +190,7 @@ export function Header() {
             </SheetContent>
           </Sheet>
         </div>
+
       </div>
     </header>
   );

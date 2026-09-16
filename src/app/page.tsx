@@ -6,13 +6,17 @@ import { BlogPreviewSection } from "@/components/home/blog-preview";
 import { ReviewsSection } from "@/components/home/reviews";
 import { FaqSection } from "@/components/home/faq";
 import { getDemoParams } from "@/lib/demo-params";
+import { getPublishedPosts } from "@/lib/blog-service";
 
 type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 export default async function HomePage(props: Props) {
-  const params = await getDemoParams(props.searchParams);
+  const [params, posts] = await Promise.all([
+    getDemoParams(props.searchParams),
+    getPublishedPosts(),
+  ]);
 
   return (
     <div className="flex flex-col w-full h-full">
@@ -20,7 +24,7 @@ export default async function HomePage(props: Props) {
       <IssuesGrid />
       <KintsugiPhilosophySection />
       <ServicesSection />
-      <BlogPreviewSection />
+      <BlogPreviewSection posts={posts} />
       <ReviewsSection />
       <FaqSection />
     </div>

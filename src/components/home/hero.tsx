@@ -8,26 +8,26 @@ import { AutumnBranch, KintsugiVase } from "@/components/decorations/autumn-deco
 
 export function HeroSection({ field }: { field?: string }) {
   return (
-    <section className="relative pt-16 pb-16 lg:pt-28 lg:pb-24 overflow-hidden bg-[#F5EBE1]">
-      {/* Decorative Autumn Leaves in background (like user's reference illustration) */}
+    <section className="relative pt-24 sm:pt-28 lg:pt-36 pb-12 sm:pb-16 lg:pb-24 overflow-hidden bg-[#F5EBE1]">
+      {/* Decorative Autumn Leaves in background */}
       <div className="absolute top-0 left-0 -translate-x-6 -translate-y-4 pointer-events-none z-0">
-        <AutumnBranch className="w-36 h-44 opacity-65 md:opacity-80" />
+        <AutumnBranch className="w-28 sm:w-36 h-36 sm:h-44 opacity-50 sm:opacity-80" />
       </div>
       <div className="absolute top-1/2 -right-8 -translate-y-1/2 pointer-events-none z-0">
-        <AutumnBranch className="w-44 h-52 opacity-60 md:opacity-75" flipped />
+        <AutumnBranch className="w-32 sm:w-44 h-40 sm:h-52 opacity-40 sm:opacity-75" flipped />
       </div>
 
-      {/* Kintsugi Vase background reference #1 */}
+      {/* Kintsugi Vase background reference */}
       <div className="absolute -bottom-10 left-1/3 pointer-events-none z-0 hidden md:block">
         <KintsugiVase className="w-36 h-48" opacity={0.16} />
       </div>
 
       {/* Warm ambient radial glows */}
-      <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-[#E7CEB5]/50 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none z-0" />
-      <div className="absolute bottom-0 left-0 w-[450px] h-[450px] bg-[#D4AF37]/15 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none z-0" />
+      <div className="absolute top-0 right-0 w-[350px] sm:w-[550px] h-[350px] sm:h-[550px] bg-[#E7CEB5]/50 rounded-full blur-3xl -translate-y-1/3 translate-x-1/4 pointer-events-none z-0" />
+      <div className="absolute bottom-0 left-0 w-[300px] sm:w-[450px] h-[300px] sm:h-[450px] bg-[#D4AF37]/15 rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none z-0" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-8 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-8 items-center">
           {/* Left Column Text */}
           <motion.div
             initial={{ opacity: 0, y: 25 }}
@@ -35,62 +35,65 @@ export function HeroSection({ field }: { field?: string }) {
             transition={{ duration: 0.8 }}
             className="lg:col-span-7 flex flex-col items-start text-left"
           >
-            <div className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-[#EADBCB] text-[#5C2A14] text-xs font-semibold mb-5 tracking-wide uppercase border border-[#DFCEBA] shadow-xs">
-              <Sparkles className="w-3.5 h-3.5 text-[#C59B27]" />
-              <span>Psicologa Clinica • Pedagogista • Tecnico ABA</span>
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-full bg-[#EADBCB] text-[#5C2A14] text-[11px] sm:text-xs font-semibold mb-4 sm:mb-5 tracking-wide uppercase border border-[#DFCEBA] shadow-xs">
+              <Sparkles className="w-3.5 h-3.5 text-[#C59B27] shrink-0" />
+              <span className="truncate">Psicologa Clinica • Pedagogista • Tecnico ABA</span>
             </div>
 
-            {/* Titolo leggermente più piccolo per una composizione più raffinata */}
-            <h1 className="text-[#2C1E16] font-heading text-3xl sm:text-4xl lg:text-5xl font-bold leading-[1.18] tracking-tight mb-5">
+            {/* Titolo fluido e perfettamente scalato */}
+            <h1 className="text-[#2C1E16] font-heading text-2xl sm:text-4xl lg:text-5xl font-bold leading-[1.2] sm:leading-[1.18] tracking-tight mb-4 sm:mb-5">
               Uno spazio accogliente per ascoltarsi e ritrovarsi
             </h1>
 
-            <p className="text-base sm:text-lg text-[#5C4436] leading-relaxed mb-6 max-w-xl">
+            <p className="text-sm sm:text-base lg:text-lg text-[#5C4436] leading-relaxed mb-5 sm:mb-6 max-w-xl">
               Sostegno psicologico rivolto a <strong>bambini, adolescenti, giovani adulti, adulti e famiglie</strong>. Specializzata in neurodivergenze (ADHD, DSA), difficoltà scolastiche ed emotive, guidata dall'unicità della tua storia.
             </p>
 
-            {/* Location, Schedule & Ordine badge */}
-            <div className="flex flex-wrap items-center gap-3 text-xs font-medium text-[#735948] mb-8 pb-4 border-b border-[#DFCEBA] w-full">
-              <span className="flex items-center gap-1.5">
-                <MapPin className="w-4 h-4 text-primary" />
-                Bologna & Online
-              </span>
-              <span>•</span>
-              <span>Online: Lun-Gio 17:00-21:00</span>
-              <span>•</span>
-              <span>Studio: Ven 14:00-21:00</span>
-              <span>•</span>
-              <span>Albo Psicologi E-R n. 12479</span>
+            {/* Location, Schedule & Ordine badge - Clean Responsive Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3 text-xs font-medium text-[#735948] mb-6 sm:mb-8 pb-4 sm:pb-5 border-b border-[#DFCEBA] w-full">
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary shrink-0" />
+                <span>Bologna (Via della Beverara) & Online</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-primary shrink-0" />
+                <span>Online: Lun-Gio | Studio: Ven</span>
+              </div>
+              <div className="flex items-center gap-2 sm:col-span-2 text-[11px] text-[#8C6D58]">
+                <span>Iscritta all'Albo Psicologi E-R n. 12479</span>
+              </div>
             </div>
 
             {/* CTA Buttons */}
-            <div className="flex flex-wrap items-center gap-4 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
               <SmartLink
                 href="/contatti"
-                className="w-full sm:w-auto bg-primary hover:bg-[#AF4621] text-white px-7 py-3.5 rounded-full text-base font-medium transition-all shadow-md hover:shadow-lg terracotta-glow text-center"
+                className="w-full sm:w-auto bg-primary hover:bg-[#AF4621] text-white px-7 py-3 sm:py-3.5 rounded-full text-sm sm:text-base font-medium transition-all shadow-md hover:shadow-lg terracotta-glow text-center"
               >
                 Prenota un consulto
               </SmartLink>
 
-              <a
-                href="https://www.miodottore.it/profilo/giovanna-valentina-padalino"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto bg-white/90 hover:bg-white text-[#2C1E16] border border-[#DFCEBA] px-6 py-3.5 rounded-full text-base font-medium transition-all flex items-center justify-center gap-2 shadow-sm text-center"
-              >
-                <Calendar className="w-4 h-4 text-primary" />
-                <span>Agenda MioDottore</span>
-              </a>
+              <div className="grid grid-cols-2 sm:flex items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
+                <a
+                  href="https://www.miodottore.it/profilo/giovanna-valentina-padalino"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-white/90 hover:bg-white text-[#2C1E16] border border-[#DFCEBA] px-4 sm:px-5 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm text-center truncate"
+                >
+                  <Calendar className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span className="truncate">MioDottore</span>
+                </a>
 
-              <a
-                href="https://wa.me/393492679598?text=Gentile%20Dott.ssa%20Padalino,%20vorrei%20richiedere%20informazioni%20per%20un%20appuntamento."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto text-emerald-800 hover:text-emerald-900 bg-emerald-100/80 hover:bg-emerald-100 border border-emerald-300 px-5 py-3.5 rounded-full text-base font-medium transition-all flex items-center justify-center gap-2 text-center"
-              >
-                <MessageCircle className="w-4 h-4 text-emerald-700" />
-                <span>WhatsApp</span>
-              </a>
+                <a
+                  href="https://wa.me/393492679598?text=Gentile%20Dott.ssa%20Padalino,%20vorrei%20richiedere%20informazioni%20per%20un%20appuntamento."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-emerald-800 hover:text-emerald-900 bg-emerald-100/90 hover:bg-emerald-100 border border-emerald-300 px-4 sm:px-5 py-3 sm:py-3.5 rounded-full text-xs sm:text-sm font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm text-center truncate"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                  <span className="truncate">WhatsApp</span>
+                </a>
+              </div>
             </div>
           </motion.div>
 

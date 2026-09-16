@@ -44,27 +44,27 @@ const areas = [
 
 export function IssuesGrid() {
   return (
-    <section className="py-20 md:py-28 bg-[#FBF8F3] border-t border-[#E8DDCF]/70">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="py-14 sm:py-20 md:py-28 bg-[#FBF8F3] border-t border-[#E8DDCF]/70">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.05, margin: "100px 0px" }}
           transition={{ duration: 0.6 }}
-          className="text-center max-w-3xl mx-auto mb-16"
+          className="text-center max-w-3xl mx-auto mb-10 sm:mb-16"
         >
           <span className="text-[#C85A32] font-semibold tracking-widest uppercase text-xs mb-3 block">
             Specializzazioni & Competenze
           </span>
-          <h2 className="text-[#2C1E16] font-heading text-3xl md:text-5xl font-bold mb-5">
+          <h2 className="text-[#2C1E16] font-heading text-2xl sm:text-3xl md:text-5xl font-bold mb-3 sm:mb-5">
             Aree di Intervento Clinico ed Educativo
           </h2>
-          <p className="text-base sm:text-lg text-[#6B5547] leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-[#6B5547] leading-relaxed">
             Unire psicologia clinica, pedagogia e lavoro educativo per comprendere la persona nella sua interezza, senza fermarsi al sintomo.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {areas.map((item, idx) => (
             <motion.div
               key={idx}
@@ -72,19 +72,19 @@ export function IssuesGrid() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.05, margin: "100px 0px" }}
               transition={{ duration: 0.5, delay: idx * 0.08 }}
-              className="bg-white p-8 rounded-3xl shadow-sm border border-[#E8DDCF] hover:shadow-md hover:border-[#C85A32]/40 transition-all flex flex-col justify-between group"
+              className="bg-white p-5 sm:p-7 md:p-8 rounded-2xl sm:rounded-3xl shadow-xs sm:shadow-sm border border-[#E8DDCF] hover:shadow-md hover:border-[#C85A32]/40 transition-all flex flex-col justify-between group"
             >
               <div>
-                <div className="w-13 h-13 bg-[#F5EFEB] text-[#C85A32] rounded-2xl flex items-center justify-center mb-6 group-hover:scale-105 group-hover:bg-[#C85A32] group-hover:text-white transition-all duration-300">
+                <div className="w-11 h-11 sm:w-13 sm:h-13 bg-[#F5EFEB] text-[#C85A32] rounded-xl sm:rounded-2xl flex items-center justify-center mb-4 sm:mb-6 group-hover:scale-105 group-hover:bg-[#C85A32] group-hover:text-white transition-all duration-300">
                   {item.icon}
                 </div>
-                <span className="text-xs font-semibold text-[#8C6D58] uppercase tracking-wider block mb-1">
+                <span className="text-[11px] sm:text-xs font-semibold text-[#8C6D58] uppercase tracking-wider block mb-1">
                   {item.subtitle}
                 </span>
-                <h3 className="text-xl font-heading font-bold text-[#2C1E16] mb-3 group-hover:text-[#C85A32] transition-colors">
+                <h3 className="text-lg sm:text-xl font-heading font-bold text-[#2C1E16] mb-2 sm:mb-3 group-hover:text-[#C85A32] transition-colors">
                   {item.title}
                 </h3>
-                <p className="text-sm text-[#5C4436] leading-relaxed">
+                <p className="text-xs sm:text-sm text-[#5C4436] leading-relaxed">
                   {item.description}
                 </p>
               </div>

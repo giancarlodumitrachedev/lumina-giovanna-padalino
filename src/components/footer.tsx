@@ -13,30 +13,30 @@ export function Footer() {
       <div className="absolute top-0 right-0 w-96 h-96 bg-[#C85A32]/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#D4AF37]/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2 pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Banner CTA */}
-        <div className="text-center mb-16 relative">
+        <div className="text-center mb-12 sm:mb-16 relative">
           <motion.div
             initial={{ opacity: 0, y: 25 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.05, margin: "100px 0px" }}
             transition={{ duration: 0.7 }}
-            className="bg-[#2E1F17]/80 backdrop-blur-sm border border-[#483326] p-8 md:p-12 rounded-3xl max-w-4xl mx-auto shadow-xl"
+            className="bg-[#2E1F17]/80 backdrop-blur-sm border border-[#483326] p-6 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl max-w-4xl mx-auto shadow-xl"
           >
-            <div className="w-16 h-1 bg-[#D4AF37] mx-auto rounded-full mb-6" />
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-heading font-bold mb-4 max-w-2xl mx-auto leading-tight text-[#FAF6F0]">
+            <div className="w-12 sm:w-16 h-1 bg-[#D4AF37] mx-auto rounded-full mb-5 sm:mb-6" />
+            <h2 className="text-xl sm:text-3xl lg:text-4xl font-heading font-bold mb-3 sm:mb-4 max-w-2xl mx-auto leading-snug sm:leading-tight text-[#FAF6F0]">
               Iniziamo insieme il tuo percorso di ascolto e consapevolezza
             </h2>
-            <p className="text-[#FAF6F0]/75 mb-8 max-w-2xl mx-auto text-sm md:text-base leading-relaxed">
+            <p className="text-[#FAF6F0]/75 mb-6 sm:mb-8 max-w-2xl mx-auto text-xs sm:text-sm md:text-base leading-relaxed">
               Ricevo online dal lunedì al giovedì e in studio a Bologna il venerdì, per percorsi personalizzati rivolti a bambini, adolescenti, giovani adulti, adulti e famiglie.
             </p>
             
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4">
               <a
                 href="https://wa.me/393492679598?text=Gentile%20Dott.ssa%20Padalino,%20vorrei%20richiedere%20informazioni%20per%20un%20appuntamento."
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-7 py-3.5 bg-emerald-700 hover:bg-emerald-600 text-white font-medium rounded-full transition-all flex items-center justify-center gap-2 shadow"
+                className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 bg-emerald-700 hover:bg-emerald-600 text-white font-medium rounded-full transition-all flex items-center justify-center gap-2 shadow text-sm sm:text-base"
               >
                 <MessageCircle className="w-4 h-4" />
                 Scrivimi su WhatsApp
@@ -46,7 +46,7 @@ export function Footer() {
                 href="https://www.miodottore.it/profilo/giovanna-valentina-padalino"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto px-7 py-3.5 bg-[#C85A32] hover:bg-[#AF4621] text-white font-medium rounded-full transition-all flex items-center justify-center gap-2 shadow"
+                className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 bg-[#C85A32] hover:bg-[#AF4621] text-white font-medium rounded-full transition-all flex items-center justify-center gap-2 shadow text-sm sm:text-base"
               >
                 <Calendar className="w-4 h-4" />
                 Prenota su MioDottore
@@ -54,7 +54,7 @@ export function Footer() {
 
               <SmartLink
                 href="/contatti"
-                className="w-full sm:w-auto px-7 py-3.5 border border-[#FAF6F0]/25 text-[#FAF6F0] font-medium rounded-full hover:bg-white/10 transition-colors text-center"
+                className="w-full sm:w-auto px-6 sm:px-7 py-3 sm:py-3.5 border border-[#FAF6F0]/25 text-[#FAF6F0] font-medium rounded-full hover:bg-white/10 transition-colors text-center text-sm sm:text-base"
               >
                 Tutti i contatti
               </SmartLink>
@@ -63,7 +63,7 @@ export function Footer() {
         </div>
 
         {/* Footer Columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 mb-14">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12 sm:mb-14">
           <div className="space-y-4">
             <h3 className="text-xl font-heading font-bold text-[#FAF6F0]">
               Dott.ssa Giovanna Padalino

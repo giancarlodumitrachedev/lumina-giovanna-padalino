@@ -18,32 +18,32 @@ export default async function ContattiPage({
   const params = await getDemoParams(searchParams);
 
   return (
-    <div className="py-16 md:py-24 bg-[#F5EBE1] min-h-screen relative overflow-hidden">
+    <div className="pt-24 sm:pt-28 md:pt-32 pb-16 md:pb-24 bg-[#F5EBE1] min-h-screen relative overflow-hidden">
       {/* Decorative Autumn foliage in background */}
       <div className="absolute top-0 right-0 translate-x-6 -translate-y-6 pointer-events-none z-0">
-        <AutumnBranch className="w-48 h-56 opacity-60" flipped />
+        <AutumnBranch className="w-36 sm:w-48 h-44 sm:h-56 opacity-50 sm:opacity-60" flipped />
       </div>
       <div className="absolute bottom-10 left-0 -translate-x-8 pointer-events-none z-0">
-        <AutumnBranch className="w-44 h-52 opacity-50" />
+        <AutumnBranch className="w-32 sm:w-44 h-40 sm:h-52 opacity-40 sm:opacity-50" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Header Title */}
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 py-1.5 px-4 rounded-full bg-[#EADBCB] text-[#5C2A14] text-xs font-semibold mb-4 tracking-wide uppercase border border-[#DFCEBA]">
-            <Sparkles className="w-3.5 h-3.5 text-[#C59B27]" />
+        <div className="text-center max-w-3xl mx-auto mb-10 sm:mb-16">
+          <div className="inline-flex items-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-4 rounded-full bg-[#EADBCB] text-[#5C2A14] text-[11px] sm:text-xs font-semibold mb-3 sm:mb-4 tracking-wide uppercase border border-[#DFCEBA]">
+            <Sparkles className="w-3.5 h-3.5 text-[#C59B27] shrink-0" />
             <span>Prenotazioni & Informazioni</span>
           </div>
-          <h1 className="text-[#2C1E16] font-heading text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
+          <h1 className="text-[#2C1E16] font-heading text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4">
             Prendi contatto con lo studio
           </h1>
-          <p className="text-base sm:text-lg text-[#6B5547] leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg text-[#6B5547] leading-relaxed">
             Sono a tua disposizione per accogliere le tue domande, fornirti informazioni dettagliate sui percorsi o concordare un primo colloquio in presenza a Bologna o online.
           </p>
         </div>
 
         {/* Quick Action Cards (WhatsApp, MioDottore, Instagram, Facebook) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4 lg:gap-6 mb-12 sm:mb-16">
           {/* WhatsApp Card */}
           <a
             href="https://wa.me/393492679598?text=Gentile%20Dott.ssa%20Padalino,%20vorrei%20richiedere%20informazioni%20per%20un%20appuntamento."
@@ -142,12 +142,12 @@ export default async function ContattiPage({
         </div>
 
         {/* Main Grid: Form & Studio Details */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start mb-16">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-16">
           <div className="lg:col-span-6">
             <ContactForm />
           </div>
 
-          <div className="lg:col-span-6 space-y-8 bg-white/95 p-8 md:p-10 rounded-3xl shadow-sm border border-[#DFCEBA]">
+          <div className="lg:col-span-6 space-y-6 sm:space-y-8 bg-white/95 p-5 sm:p-7 md:p-10 rounded-2xl sm:rounded-3xl shadow-xs sm:shadow-sm border border-[#DFCEBA]">
             <div>
               <h3 className="font-heading font-bold text-2xl text-[#2C1E16] mb-6">
                 Orari e Informazioni sullo Studio
