@@ -1,0 +1,118 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-sans);
+  --font-heading: var(--font-heading);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-gold: var(--kintsugi-gold);
+  --color-gold-light: var(--kintsugi-gold-light);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+}
+
+@utility container {
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+  @media (width >= 1280px) {
+    max-width: 1240px;
+  }
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border, currentColor);
+  }
+}
+
+@layer base {
+  :root {
+    /* Palette Autunnale Calda, Saturata & Materica - Studio Dott.ssa Giovanna Padalino */
+    --background: #F5EBE1; /* Tonalità pesca/biscotto crema più calda, morbida e saturata, non bianca */
+    --foreground: #2C1E16; /* Marrone scuro caffè, caldo ed empatico */
+    --card: #FCFAF6;      /* Avorio caldo leggero */
+    --card-foreground: #2C1E16;
+    --popover: #F5EBE1;
+    --popover-foreground: #2C1E16;
+    
+    /* Terracotta Caldo Intenso (Accento Primario & CTA) */
+    --primary: #C85A32;
+    --primary-foreground: #FFFFFF;
+    
+    /* Superfici secondarie morbide (Argilla dolce, Lino cotto) */
+    --secondary: #EADBCB;
+    --secondary-foreground: #5C2A14;
+    
+    /* Toni tenui per testi secondari */
+    --muted: #E5D5C2;
+    --muted-foreground: #735948;
+    
+    /* Dettagli Kintsugi Oro */
+    --accent: #C59B27;
+    --accent-foreground: #FFFFFF;
+    --kintsugi-gold: #D4AF37;
+    --kintsugi-gold-light: #F7EFCF;
+    
+    --destructive: #BD3A2B;
+    --destructive-foreground: #FFFFFF;
+    
+    --border: #DFCEBA;
+    --input: #DAC5AF;
+    --ring: #C85A32;
+    
+    --radius: 0.85rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading), serif;
+  }
+}
+
+/* Stili Kintsugi e decorazioni organiche */
+.kintsugi-line {
+  background: linear-gradient(90deg, transparent 0%, #D4AF37 35%, #C59B27 50%, #D4AF37 65%, transparent 100%);
+  height: 2px;
+}
+
+.kintsugi-glow {
+  box-shadow: 0 0 25px -5px rgba(197, 155, 39, 0.25);
+}
+
+.terracotta-glow {
+  box-shadow: 0 10px 30px -8px rgba(200, 90, 50, 0.28);
+}
