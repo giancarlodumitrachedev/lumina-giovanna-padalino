@@ -28,7 +28,15 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 
-const navItems = [
+const desktopNavLinks = [
+  { href: "/", label: "Home" },
+  { href: "/chi-sono", label: "Chi Sono" },
+  { href: "/servizi", label: "Servizi" },
+  { href: "/blog", label: "Blog" },
+  { href: "/contatti", label: "Contatti" },
+];
+
+const mobileNavItems = [
   { 
     href: "/", 
     label: "Home", 
@@ -96,13 +104,13 @@ export function Header() {
           </div>
         </SmartLink>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex gap-6 items-center">
-          {navItems.map((link) => (
+        {/* Desktop Nav - Original Clean Layout */}
+        <nav className="hidden md:flex gap-5 lg:gap-6 items-center">
+          {desktopNavLinks.map((link) => (
             <SmartLink
               key={link.href}
               href={link.href}
-              className="text-[#2C1E16]/85 hover:text-primary font-medium text-[15px] tracking-wide transition-all py-1 hover:border-b-2 hover:border-primary"
+              className="text-[#2C1E16]/85 hover:text-primary font-medium text-[15px] tracking-wide transition-all py-1 hover:border-b-2 hover:border-primary whitespace-nowrap"
             >
               {link.label}
             </SmartLink>
@@ -113,7 +121,7 @@ export function Header() {
             href="https://www.miodottore.it/profilo/giovanna-valentina-padalino"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#EADBCB] text-[#2C1E16] hover:bg-[#DFCDBB] transition-all border border-[#DFCEBA]"
+            className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-[#EADBCB] text-[#2C1E16] hover:bg-[#DFCDBB] transition-all border border-[#DFCEBA] whitespace-nowrap"
             title="Prenota su MioDottore"
           >
             <Calendar className="w-3.5 h-3.5 text-primary" />
@@ -144,7 +152,7 @@ export function Header() {
 
           <SmartLink
             href="/contatti"
-            className="bg-primary hover:bg-[#AF4621] text-white px-5 py-2.5 rounded-full text-[14px] font-medium transition-all shadow-sm hover:shadow terracotta-glow"
+            className="bg-primary hover:bg-[#AF4621] text-white px-5 py-2.5 rounded-full text-[14px] font-medium transition-all shadow-sm hover:shadow terracotta-glow whitespace-nowrap"
           >
             Prenota un consulto
           </SmartLink>
@@ -227,7 +235,7 @@ export function Header() {
                     Navigazione
                   </span>
                   <nav className="flex flex-col gap-1">
-                    {navItems.map((item) => {
+                    {mobileNavItems.map((item) => {
                       const Icon = item.icon;
                       const isActive =
                         pathname === item.href ||
