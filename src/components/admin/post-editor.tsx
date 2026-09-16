@@ -1,13 +1,26 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { savePostAction } from "@/app/actions/admin-blog";
+import { savePostAction, uploadCoverImageAction } from "@/app/actions/admin-blog";
 import { DBPost } from "@/lib/blog-service";
 import { SmartLink } from "@/components/smart-link";
-import { ArrowLeft, Save, Eye, Edit, Sparkles, CheckCircle2, ShieldAlert } from "lucide-react";
+import {
+  ArrowLeft,
+  Save,
+  Eye,
+  Edit,
+  Sparkles,
+  CheckCircle2,
+  ShieldAlert,
+  UploadCloud,
+  Image as ImageIcon,
+  Trash2,
+  RefreshCw,
+  Clock,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { RichTextEditor } from "./rich-text-editor";
-import { parseBlogContentToHtml } from "@/lib/content-parser";
+import { parseBlogContentToHtml, calculateReadingTime } from "@/lib/content-parser";
 
 const categories = [
   "ADHD e neurodivergenze",
@@ -26,8 +39,48 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
   const [excerpt, setExcerpt] = useState(post?.excerpt || "");
   const [content, setContent] = useState(post?.content || "");
   const [category, setCategory] = useState<string>(post?.category || categories[0]);
-  const [readTime, setReadTime] = useState(post?.read_time || "5 min di lettura");
+  const [readTime, setReadTime] = useState(
+    post?.read_time || calculateReadingTime(post?.content || "").text
+  );
+  const [coverImage, setCoverImage] = useState<string>(post?.cover_image || "");
   const [isPublished, setIsPublished] = useState(post ? post.is_published : true);
+
+  // Stati upload immagine su Supabase Storage
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+
+  // Gestione upload copertina su Supabase Storage
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    setUploadError(null);
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await uploadCoverImageAction(formData);
+      if (res.success && res.url) {
+        setCoverImage(res.url);
+      } else {
+        setUploadError(res.error || "Errore durante il caricamento");
+      }
+    } catch (err: any) {
+      setUploadError(err.message || "Errore di connessione");
+    } finally {
+      setIsUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  // Aggiornamento contenuto ed ricalcolo automatico del tempo di lettura
+  const handleContentChange = (newHtml: string) => {
+    setContent(newHtml);
+    const reading = calculateReadingTime(newHtml);
+    setReadTime(reading.text);
+  };
 
   return (
     <div className="space-y-6">
@@ -45,7 +98,9 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
               {post ? "Modifica Articolo" : "Nuovo Articolo"}
             </h1>
             <p className="text-xs text-[#735948]">
-              {post ? "Aggiorna contenuti e stato di pubblicazione" : "Crea una nuova risorsa per il blog Spazio Accogliente"}
+              {post
+                ? "Aggiorna contenuti, copertina e stato di pubblicazione"
+                : "Crea una nuova risorsa clinica per il blog Spazio Accogliente"}
             </p>
           </div>
         </div>
@@ -62,7 +117,7 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
             }`}
           >
             <Edit className="w-3.5 h-3.5" />
-            <span>Editor</span>
+            <span>Editor Stile Word</span>
           </button>
           <button
             type="button"
@@ -106,8 +161,96 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
       {activeTab === "edit" ? (
         <form action={formAction} className="space-y-6">
           <input type="hidden" name="id" value={post?.id || ""} />
+          <input type="hidden" name="cover_image" value={coverImage} />
 
           <div className="bg-white/95 p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-[#DFCEBA] shadow-xs space-y-6">
+            {/* Upload Immagine di Copertina (Supabase Storage) */}
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16]">
+                  Immagine di Copertina (Supabase Storage)
+                </label>
+                <span className="text-[11px] text-[#8C6D58]">
+                  Consigliata proporzione orizzontale 16:9 o 21:9
+                </span>
+              </div>
+
+              {coverImage ? (
+                <div className="relative rounded-2xl overflow-hidden border border-[#DFCEBA] bg-[#FAF6F0] group">
+                  <div className="relative aspect-[21/9] sm:aspect-[3/1] w-full">
+                    <img
+                      src={coverImage}
+                      alt="Anteprima copertina"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="p-3 bg-white/95 border-t border-[#DFCEBA] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                    <span className="text-xs text-[#735948] truncate flex items-center gap-1.5">
+                      <ImageIcon className="w-3.5 h-3.5 text-[#C85A32]" />
+                      Copertina caricata su Supabase Storage
+                    </span>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <label className="cursor-pointer px-3 py-1.5 bg-[#FAF6F0] hover:bg-[#EADBCB] text-[#2C1E16] text-xs font-semibold rounded-lg border border-[#DFCEBA] transition-colors flex items-center gap-1">
+                        <RefreshCw className="w-3 h-3" />
+                        <span>Sostituisci</span>
+                        <input
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp,image/avif"
+                          onChange={handleImageUpload}
+                          disabled={isUploading}
+                          className="sr-only"
+                        />
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setCoverImage("")}
+                        className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Rimuovi</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <label className="relative flex flex-col items-center justify-center p-6 sm:p-8 border-2 border-dashed border-[#DFCEBA] hover:border-[#C85A32] rounded-2xl bg-[#FAF6F0]/60 hover:bg-[#FAF6F0] cursor-pointer transition-all text-center group">
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp,image/avif"
+                    onChange={handleImageUpload}
+                    disabled={isUploading}
+                    className="sr-only"
+                  />
+                  {isUploading ? (
+                    <div className="flex flex-col items-center gap-2 py-3">
+                      <div className="w-8 h-8 border-2 border-[#C85A32] border-t-transparent rounded-full animate-spin" />
+                      <span className="text-xs font-medium text-[#C85A32]">
+                        Caricamento in corso su Supabase Storage...
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="p-3 bg-white rounded-full text-[#C85A32] shadow-xs group-hover:scale-105 transition-transform mb-2">
+                        <UploadCloud className="w-6 h-6" />
+                      </div>
+                      <p className="text-xs sm:text-sm font-semibold text-[#2C1E16]">
+                        Clicca o trascina qui la copertina dell'articolo
+                      </p>
+                      <p className="text-[11px] text-[#8C6D58] mt-1">
+                        Formati supportati: JPG, PNG, WEBP, AVIF (fino a 5MB)
+                      </p>
+                    </>
+                  )}
+                </label>
+              )}
+
+              {uploadError && (
+                <p className="text-xs text-rose-600 mt-2 flex items-center gap-1">
+                  <span>⚠️</span> {uploadError}
+                </p>
+              )}
+            </div>
+
             {/* Titolo */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16] mb-2">
@@ -119,12 +262,12 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
                 required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="es. Comprendere l'ADHD nell'adulto..."
+                placeholder="es. ADHD negli adulti: quando la difficoltà non è mancanza di volontà..."
                 className="w-full px-4 py-3 bg-[#FAF6F0] border border-[#DFCEBA] rounded-xl text-base font-heading font-semibold text-[#2C1E16] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30 focus:border-[#C85A32]"
               />
             </div>
 
-            {/* Grid Categoria & Tempo di Lettura */}
+            {/* Grid Categoria & Tempo di Lettura (Calcolato in automatico) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16] mb-2">
@@ -146,17 +289,26 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16] mb-2">
-                  Tempo di Lettura Stimato
-                </label>
-                <input
-                  type="text"
-                  name="read_time"
-                  value={readTime}
-                  onChange={(e) => setReadTime(e.target.value)}
-                  placeholder="es. 5 min di lettura"
-                  className="w-full px-3.5 py-2.5 bg-[#FAF6F0] border border-[#DFCEBA] rounded-xl text-xs sm:text-sm text-[#2C1E16] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30"
-                />
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16]">
+                    Tempo di Lettura
+                  </label>
+                  <span className="inline-flex items-center gap-1 text-[11px] text-[#C85A32] font-semibold bg-[#FAF6F0] px-2 py-0.5 rounded-md border border-[#DFCEBA]/70">
+                    <Sparkles className="w-3 h-3 text-[#D4AF37]" />
+                    Calcolato in automatico
+                  </span>
+                </div>
+                <div className="relative">
+                  <Clock className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#8C6D58]" />
+                  <input
+                    type="text"
+                    name="read_time"
+                    value={readTime}
+                    onChange={(e) => setReadTime(e.target.value)}
+                    placeholder="es. 5 min di lettura"
+                    className="w-full pl-10 pr-3.5 py-2.5 bg-[#FAF6F0] border border-[#DFCEBA] rounded-xl text-xs sm:text-sm text-[#2C1E16] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30"
+                  />
+                </div>
               </div>
             </div>
 
@@ -191,7 +343,7 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
               </div>
               <RichTextEditor
                 initialValue={content}
-                onChange={(html) => setContent(html)}
+                onChange={handleContentChange}
                 name="content"
               />
             </div>
@@ -243,11 +395,24 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
       ) : (
         /* Live Preview Mode */
         <div className="bg-white/95 rounded-2xl sm:rounded-3xl p-6 sm:p-12 border border-[#DFCEBA] shadow-sm space-y-6">
+          {coverImage && (
+            <div className="relative aspect-[21/9] w-full rounded-2xl overflow-hidden shadow-xs border border-[#DFCEBA] mb-6">
+              <img
+                src={coverImage}
+                alt={title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
+
           <div className="flex items-center gap-2">
             <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#EADBCB] text-[#C85A32] border border-[#DFCEBA]">
               {category}
             </span>
-            <span className="text-xs text-[#8C6D58]">• {readTime}</span>
+            <span className="text-xs text-[#8C6D58] flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" />
+              {readTime}
+            </span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl font-heading font-bold text-[#2C1E16]">

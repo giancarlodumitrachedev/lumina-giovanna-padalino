@@ -66,3 +66,27 @@ export function cleanPastedWordHtml(html: string): string {
 
   return clean;
 }
+
+/**
+ * Calcola automaticamente il tempo di lettura stimato in base al conteggio parole (~200 parole/minuto)
+ */
+export function calculateReadingTime(textOrHtml: string): { text: string; minutes: number; words: number } {
+  if (!textOrHtml) return { text: "1 min di lettura", minutes: 1, words: 0 };
+
+  const clean = textOrHtml
+    .replace(/<[^>]*>/g, " ")
+    .replace(/&[a-z0-9#]+;/gi, " ")
+    .replace(/[#*_`~>-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  const words = clean ? clean.split(/\s+/).filter(Boolean).length : 0;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+
+  return {
+    text: `${minutes} min di lettura`,
+    minutes,
+    words,
+  };
+}
+

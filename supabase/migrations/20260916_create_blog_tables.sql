@@ -138,3 +138,27 @@ Nel percorso di accompagnamento psicologico, utilizziamo la metafora e la scritt
   true
 )
 on conflict (slug) do nothing;
+
+-- 4. Creazione Bucket Supabase Storage per Immagini di Copertina
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values (
+  'blog-covers',
+  'blog-covers',
+  true,
+  5242880,
+  array['image/jpeg', 'image/png', 'image/webp', 'image/avif']
+)
+on conflict (id) do update set public = true;
+
+-- Policy di lettura pubblica per le copertine
+drop policy if exists "Accesso pubblico in lettura per blog-covers" on storage.objects;
+create policy "Accesso pubblico in lettura per blog-covers"
+  on storage.objects for select
+  using (bucket_id = 'blog-covers');
+
+-- Policy di gestione per service role e admin
+drop policy if exists "Upload copertine per service role e admin" on storage.objects;
+create policy "Upload copertine per service role e admin"
+  on storage.objects for all
+  using (bucket_id = 'blog-covers');
+

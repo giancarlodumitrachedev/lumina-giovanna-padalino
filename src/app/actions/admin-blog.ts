@@ -195,3 +195,67 @@ export async function deletePostAction(id: string) {
     return { success: false, error: err.message };
   }
 }
+
+/**
+ * Upload immagine di copertina su Supabase Storage (bucket 'blog-covers')
+ */
+export async function uploadCoverImageAction(formData: FormData): Promise<{ success: boolean; url?: string; error?: string }> {
+  const isAuth = await verifyAdminSession();
+  if (!isAuth) {
+    return { success: false, error: "Non autorizzato. Effettua il login." };
+  }
+
+  const file = formData.get("file") as File | null;
+  if (!file || !(file instanceof File) || file.size === 0) {
+    return { success: false, error: "Nessun file selezionato." };
+  }
+
+  const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+  if (!allowedTypes.includes(file.type)) {
+    return { success: false, error: "Formato non supportato. Usa JPG, PNG o WEBP." };
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    return { success: false, error: "L'immagine supera il limite massimo di 5MB." };
+  }
+
+  try {
+    const supabase = createServerClient();
+    const bucketName = "blog-covers";
+
+    // Verifica / creazione bucket
+    const { data: buckets } = await supabase.storage.listBuckets();
+    if (!buckets?.some((b) => b.name === bucketName)) {
+      await supabase.storage.createBucket(bucketName, {
+        public: true,
+        fileSizeLimit: 5242880,
+        allowedMimeTypes: allowedTypes,
+      });
+    }
+
+    const fileExt = file.name.split(".").pop() || "jpg";
+    const sanitizedName = slugify(file.name.replace(/\.[^/.]+$/, ""));
+    const filePath = `covers/${Date.now()}-${sanitizedName}.${fileExt}`;
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucketName)
+      .upload(filePath, buffer, {
+        contentType: file.type,
+        cacheControl: "31536000",
+        upsert: true,
+      });
+
+    if (uploadError) {
+      return { success: false, error: `Errore durante il caricamento: ${uploadError.message}` };
+    }
+
+    const { data } = supabase.storage.from(bucketName).getPublicUrl(filePath);
+
+    return { success: true, url: data.publicUrl };
+  } catch (err: any) {
+    return { success: false, error: `Errore: ${err.message}` };
+  }
+}
+

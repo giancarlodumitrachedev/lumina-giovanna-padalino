@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { SmartLink } from "@/components/smart-link";
 import { blogPosts, BlogPost } from "@/lib/blog-data";
 import { ArrowRight, BookOpen, Clock } from "lucide-react";
@@ -64,6 +65,18 @@ export function BlogPreviewSection({ posts }: { posts?: BlogPost[] }) {
               className="bg-white/95 rounded-2xl sm:rounded-3xl p-5 sm:p-7 shadow-xs sm:shadow-sm border border-[#DFCEBA] flex flex-col justify-between hover:shadow-md hover:border-[#C85A32]/50 transition-all group"
             >
               <div>
+                {post.image && (
+                  <div className="relative aspect-[16/9] w-full rounded-xl sm:rounded-2xl overflow-hidden mb-4 border border-[#DFCEBA]">
+                    <Image
+                      src={post.image}
+                      alt={post.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between gap-2 mb-3 sm:mb-4">
                   <span className="px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-full text-[11px] sm:text-xs font-semibold bg-[#EADBCB] text-[#C85A32] border border-[#DFCEBA] truncate">
                     {post.category}

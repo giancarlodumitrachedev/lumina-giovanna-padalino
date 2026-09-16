@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Image from "next/image";
 import { BlogPost, blogCategories } from "@/lib/blog-data";
 import { SmartLink } from "@/components/smart-link";
 import { Search, Clock, Calendar, ArrowRight } from "lucide-react";
@@ -98,6 +99,18 @@ export function BlogFeed({ posts }: { posts: BlogPost[] }) {
                 className="bg-white rounded-3xl p-7 shadow-sm border border-[#E8DDCF] flex flex-col justify-between hover:shadow-lg hover:border-[#C85A32]/40 transition-all group"
               >
                 <div>
+                  {post.image && (
+                    <div className="relative aspect-[16/9] w-full rounded-2xl overflow-hidden mb-4 border border-[#E8DDCF]">
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      />
+                    </div>
+                  )}
+
                   <div className="flex items-center justify-between gap-2 mb-4">
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[#F5EFEB] text-[#C85A32] border border-[#E8DDCF]">
                       {post.category}
