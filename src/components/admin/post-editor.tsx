@@ -6,6 +6,8 @@ import { DBPost } from "@/lib/blog-service";
 import { SmartLink } from "@/components/smart-link";
 import { ArrowLeft, Save, Eye, Edit, Sparkles, CheckCircle2, ShieldAlert } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { RichTextEditor } from "./rich-text-editor";
+import { parseBlogContentToHtml } from "@/lib/content-parser";
 
 const categories = [
   "ADHD e neurodivergenze",
@@ -26,10 +28,6 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
   const [category, setCategory] = useState<string>(post?.category || categories[0]);
   const [readTime, setReadTime] = useState(post?.read_time || "5 min di lettura");
   const [isPublished, setIsPublished] = useState(post ? post.is_published : true);
-
-  const paragraphs = content
-    ? content.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
-    : [];
 
   return (
     <div className="space-y-6">
@@ -181,24 +179,20 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
               />
             </div>
 
-            {/* Contenuto Completo */}
+            {/* Contenuto dell'Articolo con Editor Stile Word */}
             <div>
               <div className="flex items-center justify-between mb-2">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16]">
-                  Contenuto Completo dell'Articolo *
+                  Contenuto dell'Articolo (Editor Stile Word) *
                 </label>
                 <span className="text-[11px] text-[#8C6D58]">
-                  Separa i paragrafi con una riga vuota
+                  Scrivi o incolla direttamente da Microsoft Word / Google Docs
                 </span>
               </div>
-              <textarea
+              <RichTextEditor
+                initialValue={content}
+                onChange={(html) => setContent(html)}
                 name="content"
-                required
-                rows={12}
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Scrivi qui il testo dell'articolo. Puoi usare paragrafi multipli separati da una riga vuota..."
-                className="w-full p-4 bg-[#FAF6F0] border border-[#DFCEBA] rounded-xl text-sm text-[#2C1E16] leading-relaxed font-sans focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30 focus:border-[#C85A32]"
               />
             </div>
 
@@ -264,12 +258,15 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
             {excerpt || "Riassunto dell'articolo..."}
           </p>
 
-          <div className="space-y-4 pt-4 border-t border-[#F0E4D5] text-[#3A281E] leading-relaxed text-base">
-            {paragraphs.length > 0 ? (
-              paragraphs.map((p, i) => <p key={i}>{p}</p>)
-            ) : (
-              <p className="text-[#8C6D58] italic">Il contenuto dell'articolo apparirà qui...</p>
-            )}
+          <div className="pt-6 border-t border-[#F0E4D5]">
+            <div
+              className="blog-rich-content"
+              dangerouslySetInnerHTML={{
+                __html:
+                  parseBlogContentToHtml(content) ||
+                  "<p class='text-[#8C6D58] italic'>Il contenuto dell'articolo apparirà qui...</p>",
+              }}
+            />
           </div>
         </div>
       )}

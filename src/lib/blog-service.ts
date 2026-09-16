@@ -30,10 +30,6 @@ export function formatItalianDate(dateStr: string): string {
 }
 
 function mapDBPostToBlogPost(dbPost: DBPost): BlogPost {
-  const paragraphs = dbPost.content
-    ? dbPost.content.split(/\n\n+/).map((p) => p.trim()).filter(Boolean)
-    : [];
-
   return {
     slug: dbPost.slug,
     title: dbPost.title,
@@ -42,7 +38,7 @@ function mapDBPostToBlogPost(dbPost: DBPost): BlogPost {
     readTime: dbPost.read_time || "5 min di lettura",
     date: formatItalianDate(dbPost.published_at),
     author: "Dott.ssa Giovanna Padalino",
-    content: paragraphs.length > 0 ? paragraphs : [dbPost.content],
+    content: dbPost.content,
     image: dbPost.cover_image,
   };
 }
@@ -116,7 +112,7 @@ export async function getAllPostsAdmin(): Promise<DBPost[]> {
     title: p.title,
     slug: p.slug,
     excerpt: p.excerpt,
-    content: p.content.join("\n\n"),
+    content: Array.isArray(p.content) ? p.content.join("\n\n") : p.content,
     category: p.category,
     read_time: p.readTime,
     is_published: true,

@@ -2,7 +2,7 @@ export interface BlogPost {
   slug: string;
   title: string;
   excerpt: string;
-  content: string[];
+  content: string | string[];
   category: "ADHD e neurodivergenze" | "Adolescenti e giovani adulti" | "Genitorialità e scuola" | "Ansia, autostima e relazioni" | "Psicologia e benessere";
   date: string;
   readTime: string;

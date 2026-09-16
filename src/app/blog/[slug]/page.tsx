@@ -5,6 +5,7 @@ import { SmartLink } from "@/components/smart-link";
 import { ArrowLeft, Clock, Calendar, MessageCircle, Calendar as CalendarIcon, Sparkles } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/instagram-icon";
 import { AutumnBranch } from "@/components/decorations/autumn-decorations";
+import { parseBlogContentToHtml } from "@/lib/content-parser";
 import type { Metadata } from "next";
 
 type Props = {
@@ -119,16 +120,15 @@ export default async function BlogPostPage({ params }: Props) {
           </p>
         </header>
 
-        {/* Article Body */}
-        <div className="bg-white/95 rounded-2xl sm:rounded-3xl p-5 sm:p-8 md:p-14 shadow-xs sm:shadow-sm border border-[#DFCEBA] mb-10 sm:mb-14 space-y-5 sm:space-y-6 text-[#3A281E] leading-relaxed text-sm sm:text-base md:text-lg">
-          {post.content.map((paragraph, index) => (
-            <p key={index} className="leading-relaxed">
-              {paragraph}
-            </p>
-          ))}
+        {/* Article Body with Rich Typography (H2, H3, bold, lists, quotes) */}
+        <div className="bg-white/95 rounded-2xl sm:rounded-3xl p-6 sm:p-10 md:p-14 shadow-xs sm:shadow-sm border border-[#DFCEBA] mb-10 sm:mb-14">
+          <div
+            className="blog-rich-content"
+            dangerouslySetInnerHTML={{ __html: parseBlogContentToHtml(post.content) }}
+          />
 
           {/* Kintsugi Gold Divider */}
-          <div className="pt-6">
+          <div className="pt-8 mt-8 border-t border-[#DFCEBA]/40">
             <div className="kintsugi-line w-full mb-6" />
             <p className="text-sm italic text-[#8C6D58]">
               "Spazio Accogliente" è il concept di ascolto clinico ed educativo della Dott.ssa Giovanna Padalino a Bologna e online.

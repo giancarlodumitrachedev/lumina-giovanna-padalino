@@ -39,14 +39,14 @@ export function Header() {
           : "bg-[#F5EBE1]/85 backdrop-blur-sm h-20 md:h-24"
       }`}
     >
-      <div className="max-w-7xl mx-auto flex h-full items-center justify-between px-3.5 sm:px-6 transition-all duration-300">
-        {/* Logo / Brand with Corsivo / Italic - Truncated & Scaled for Mobile */}
-        <SmartLink href="/" className="flex items-center gap-2 group min-w-0 pr-2">
-          <div className="flex flex-col min-w-0">
-            <span className="font-heading italic font-bold text-[17px] sm:text-xl md:text-2xl tracking-tight text-[#2C1E16] group-hover:text-primary transition-colors truncate">
+      <div className="max-w-7xl mx-auto flex h-full items-center justify-between px-3 sm:px-6 transition-all duration-300">
+        {/* Logo / Brand with Corsivo / Italic - Full Visibility with zero clipping */}
+        <SmartLink href="/" className="flex items-center gap-2 group shrink min-w-0 pr-1 overflow-visible">
+          <div className="flex flex-col overflow-visible">
+            <span className="font-heading italic font-bold text-[15px] min-[360px]:text-[16.5px] min-[400px]:text-[18px] sm:text-xl md:text-2xl tracking-tight text-[#2C1E16] group-hover:text-primary transition-colors whitespace-nowrap overflow-visible pr-2.5 pb-0.5">
               Dott.ssa Giovanna Padalino
             </span>
-            <span className="text-[10px] sm:text-[11px] md:text-xs uppercase tracking-wider text-muted-foreground font-sans truncate">
+            <span className="text-[10px] sm:text-[11px] md:text-xs uppercase tracking-wider text-muted-foreground font-sans whitespace-nowrap overflow-visible">
               <span className="inline sm:hidden">Psicologa Clinica • Bologna</span>
               <span className="hidden sm:inline">Psicologa Clinica & Pedagogista • Bologna</span>
             </span>
@@ -108,7 +108,7 @@ export function Header() {
         </nav>
 
         {/* Mobile Nav: Clean, Compact, Zero Overflow */}
-        <div className="md:hidden flex items-center gap-2 shrink-0">
+        <div className="md:hidden flex items-center gap-1.5 shrink-0">
           <a
             href="https://wa.me/393492679598?text=Gentile%20Dott.ssa%20Padalino,%20vorrei%20richiedere%20informazioni%20per%20un%20appuntamento."
             target="_blank"
