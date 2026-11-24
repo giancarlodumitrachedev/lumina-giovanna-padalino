@@ -2,7 +2,7 @@ import { verifyAdminSession, logoutAdminAction } from "@/app/actions/admin-blog"
 import { getAllPostsAdmin } from "@/lib/blog-service";
 import {
   getAllResourcesAdmin,
-  getDownloadAnalyticsAdmin,
+  getRawDownloadsAdmin,
 } from "@/lib/resources-service";
 import { redirect } from "next/navigation";
 import { SmartLink } from "@/components/smart-link";
@@ -43,42 +43,44 @@ export default async function AdminDashboardPage({
   const resolvedParams = await searchParams;
   const rawTab =
     typeof resolvedParams.tab === "string" ? resolvedParams.tab : "articoli";
-  const activeTab: AdminTabKey =
+  const initialTab: AdminTabKey =
     rawTab === "strumenti" || rawTab === "statistiche" ? rawTab : "articoli";
 
   const rawDays =
     typeof resolvedParams.days === "string" ? resolvedParams.days : "30";
-  const selectedDays: "7" | "30" | "all" =
+  const initialDays: "7" | "30" | "all" =
     rawDays === "7" || rawDays === "all" ? rawDays : "30";
-  const analyticsDays: number | "all" =
-    selectedDays === "all" ? "all" : Number(selectedDays);
 
-  const selectedResourceId =
+  const initialResourceId =
     typeof resolvedParams.resourceId === "string"
       ? resolvedParams.resourceId
       : "all";
 
-  const [posts, resourcesRes, analytics] = await Promise.all([
+  // Unica fetch parallela senza query duplicate su Supabase
+  const [posts, resourcesRes, downloadsRes] = await Promise.all([
     getAllPostsAdmin(),
     getAllResourcesAdmin(),
-    getDownloadAnalyticsAdmin({
-      days: analyticsDays,
-      resourceId: selectedResourceId,
-    }),
+    getRawDownloadsAdmin(),
   ]);
 
   const publishedPostsCount = posts.filter((p) => p.is_published).length;
   const publishedResourcesCount = resourcesRes.resources.filter(
     (r) => r.is_published
   ).length;
-  const totalDownloadsAllTime = resourcesRes.resources.reduce(
-    (acc, r) => acc + (r.download_count || 0),
-    0
+  const totalDownloadsAllTime = Math.max(
+    resourcesRes.resources.reduce((acc, r) => acc + (r.download_count || 0), 0),
+    downloadsRes.downloads.length
   );
+  const colleagueCount = downloadsRes.downloads.filter(
+    (d) => d.downloader_role === "collega"
+  ).length;
+  const colleaguePercentage =
+    downloadsRes.downloads.length > 0
+      ? Math.round((colleagueCount / downloadsRes.downloads.length) * 100)
+      : 0;
 
   return (
     <div className="min-h-screen bg-[#F5EBE1] pt-10 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
-      {/* Decorative foliage */}
       <div className="absolute top-0 right-0 translate-x-6 -translate-y-6 pointer-events-none z-0">
         <AutumnBranch
           className="w-36 sm:w-48 h-44 sm:h-56 opacity-40 sm:opacity-50"
@@ -106,29 +108,27 @@ export default async function AdminDashboardPage({
           <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
             <SmartLink
               href="/blog"
-              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold bg-white/80 text-[#2C1E16] hover:bg-white transition-all border border-[#DFCEBA] shadow-xs"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold bg-white/80 text-[#2C1E16] hover:bg-white transition-colors border border-[#DFCEBA] shadow-xs"
             >
               <Globe className="w-3.5 h-3.5 text-primary" />
               <span>Vedi Blog</span>
             </SmartLink>
 
-            {activeTab === "strumenti" ? (
-              <SmartLink
-                href="/admin/strumenti/nuovo"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-[#C85A32] hover:bg-[#AF4621] transition-all shadow-md terracotta-glow"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Nuovo Strumento</span>
-              </SmartLink>
-            ) : (
-              <SmartLink
-                href="/admin/nuovo"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-[#C85A32] hover:bg-[#AF4621] transition-all shadow-md terracotta-glow"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Nuovo Articolo</span>
-              </SmartLink>
-            )}
+            <SmartLink
+              href="/admin/strumenti/nuovo"
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-xs font-semibold bg-[#EADBCB] text-[#2C1E16] hover:bg-[#DFCDBB] transition-colors border border-[#DFCEBA]"
+            >
+              <Plus className="w-3.5 h-3.5 text-[#C85A32]" />
+              <span>Nuovo Strumento</span>
+            </SmartLink>
+
+            <SmartLink
+              href="/admin/nuovo"
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-xs sm:text-sm font-semibold text-white bg-[#C85A32] hover:bg-[#AF4621] transition-colors shadow-md terracotta-glow"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Nuovo Articolo</span>
+            </SmartLink>
 
             <form action={logoutAdminAction}>
               <button
@@ -182,7 +182,7 @@ export default async function AdminDashboardPage({
                 Download Totali
               </p>
               <h3 className="text-2xl font-bold font-heading text-[#2C1E16]">
-                {Math.max(totalDownloadsAllTime, analytics.totalDownloads)}
+                {totalDownloadsAllTime}
               </h3>
             </div>
             <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center border border-emerald-100 shrink-0">
@@ -196,7 +196,7 @@ export default async function AdminDashboardPage({
                 Quota Colleghi
               </p>
               <h3 className="text-2xl font-bold font-heading text-[#2C1E16]">
-                {analytics.colleaguePercentage}%
+                {colleaguePercentage}%
               </h3>
             </div>
             <div className="w-10 h-10 rounded-xl bg-[#C85A32]/10 text-[#C85A32] flex items-center justify-center shrink-0">
@@ -205,15 +205,16 @@ export default async function AdminDashboardPage({
           </div>
         </div>
 
-        {/* Tab unificati: Articoli | Strumenti & Schede | Statistiche Download */}
+        {/* Tab istantanei client-side: Articoli | Strumenti & Schede | Statistiche Download */}
         <AdminDashboardTabs
-          activeTab={activeTab}
+          initialTab={initialTab}
           posts={posts}
           resources={resourcesRes.resources}
           resourcesTablesReady={resourcesRes.tablesReady}
-          analytics={analytics}
-          selectedDays={selectedDays}
-          selectedResourceId={selectedResourceId}
+          rawDownloads={downloadsRes.downloads}
+          downloadsTablesReady={downloadsRes.tablesReady}
+          initialDays={initialDays}
+          initialResourceId={initialResourceId}
         />
       </div>
     </div>

@@ -7,8 +7,37 @@ marked.setOptions({
 });
 
 /**
+ * Sanitizza l'HTML del blog per prevenire XSS (stored/pasted HTML) rimuovendo
+ * tag eseguibili, event handler inline e protocolli pericolosi.
+ */
+export function sanitizeBlogHtml(html: string): string {
+  if (!html) return "";
+
+  return html
+    // Rimuove blocchi pericolosi e relativo contenuto
+    .replace(
+      /<(script|iframe|object|embed|style|svg|math|form|input|button|textarea|select)[^>]*>[\s\S]*?<\/\1>/gi,
+      ""
+    )
+    // Rimuove eventuali tag singoli pericolosi
+    .replace(
+      /<\/?(script|iframe|object|embed|style|svg|math|form|input|button|meta|link|base)[^>]*>/gi,
+      ""
+    )
+    // Rimuove attributi event handler (onclick, onerror, onload, ecc.)
+    .replace(/\s+on[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    // Rimuove srcdoc
+    .replace(/\s+srcdoc\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+    // Neutralizza URL javascript:, vbscript:, data:text/html in href/src
+    .replace(
+      /(\s+(?:href|src)\s*=\s*["'])\s*(?:javascript|vbscript|data\s*:\s*text\/html):[^"']*/gi,
+      "$1#"
+    );
+}
+
+/**
  * Converte qualsiasi contenuto blog (Markdown, HTML stile Word o testo piano)
- * in HTML semantico formattato per la visualizzazione.
+ * in HTML semantico formattato e sanitizzato per la visualizzazione.
  */
 export function parseBlogContentToHtml(raw: string | string[] | undefined | null): string {
   if (!raw) return "";
@@ -20,7 +49,7 @@ export function parseBlogContentToHtml(raw: string | string[] | undefined | null
 
   if (hasMarkdownPatterns) {
     try {
-      return marked.parse(contentStr) as string;
+      return sanitizeBlogHtml(marked.parse(contentStr) as string);
     } catch {
       // Fallback
     }
@@ -29,11 +58,16 @@ export function parseBlogContentToHtml(raw: string | string[] | undefined | null
   // Verifica se è già HTML formattato (es. dall'editor visuale Stile Word)
   const hasHtml = /<(p|h[1-6]|ul|ol|li|blockquote|strong|b|em|i|u|hr)[^>]*>/i.test(contentStr);
   if (hasHtml) {
-    return contentStr;
+    return sanitizeBlogHtml(contentStr);
   }
 
-  // Testo semplice con a capo
-  return contentStr
+  // Testo semplice con a capo (escaping caratteri HTML)
+  const escaped = contentStr
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+
+  return escaped
     .split(/\n\n+/)
     .map((paragraph) => `<p>${paragraph.trim().replace(/\n/g, "<br />")}</p>`)
     .join("");

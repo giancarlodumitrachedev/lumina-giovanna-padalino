@@ -11,9 +11,10 @@ export function UiEnhancements() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setShowScroll(window.scrollY > 400);
+      const next = window.scrollY > 400;
+      setShowScroll((prev) => (prev === next ? prev : next));
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     const consent = localStorage.getItem("cookieConsent");
     if (!consent) {

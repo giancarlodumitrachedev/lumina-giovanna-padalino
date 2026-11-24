@@ -1,8 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { DBPost } from "@/lib/blog-service";
-import { DBResource, DownloadAnalyticsSummary } from "@/lib/resources-data";
+import { DBResource, ResourceDownloadRecord } from "@/lib/resources-data";
 import { AdminPostList } from "@/components/admin/post-list";
 import { AdminResourceList } from "@/components/admin/resource-list";
 import { AdminDownloadAnalytics } from "@/components/admin/download-analytics";
@@ -11,31 +11,41 @@ import { FileText, FileDown, BarChart3 } from "lucide-react";
 export type AdminTabKey = "articoli" | "strumenti" | "statistiche";
 
 interface AdminDashboardTabsProps {
-  activeTab: AdminTabKey;
+  initialTab: AdminTabKey;
   posts: DBPost[];
   resources: DBResource[];
   resourcesTablesReady: boolean;
-  analytics: DownloadAnalyticsSummary;
-  selectedDays: "7" | "30" | "all";
-  selectedResourceId: string;
+  rawDownloads: ResourceDownloadRecord[];
+  downloadsTablesReady: boolean;
+  initialDays: "7" | "30" | "all";
+  initialResourceId: string;
 }
 
 export function AdminDashboardTabs({
-  activeTab,
+  initialTab,
   posts,
   resources,
   resourcesTablesReady,
-  analytics,
-  selectedDays,
-  selectedResourceId,
+  rawDownloads,
+  downloadsTablesReady,
+  initialDays,
+  initialResourceId,
 }: AdminDashboardTabsProps) {
-  const router = useRouter();
+  const [activeTab, setActiveTab] = useState<AdminTabKey>(initialTab);
 
+  // Cambio tab istantaneo a 0ms senza round-trip al server (URL aggiornato con replaceState)
   const handleSelectTab = (tab: AdminTabKey) => {
-    if (tab === "articoli") {
-      router.push("/admin");
-    } else {
-      router.push(`/admin?tab=${tab}`);
+    setActiveTab(tab);
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      if (tab === "articoli") {
+        url.searchParams.delete("tab");
+        url.searchParams.delete("days");
+        url.searchParams.delete("resourceId");
+      } else {
+        url.searchParams.set("tab", tab);
+      }
+      window.history.replaceState(null, "", url.pathname + url.search);
     }
   };
 
@@ -100,16 +110,13 @@ export function AdminDashboardTabs({
           <BarChart3 className="w-4 h-4 text-[#C85A32]" />
           <span>Statistiche Download</span>
           <span className="text-[11px] px-2 py-0.5 rounded-full bg-[#F5EBE1] text-[#735948]">
-            {analytics.totalDownloads}
+            {rawDownloads.length}
           </span>
         </button>
       </div>
 
       {/* Pannello attivo */}
-      <div
-        role="tabpanel"
-        aria-labelledby={`admin-tab-${activeTab}`}
-      >
+      <div role="tabpanel" aria-labelledby={`admin-tab-${activeTab}`}>
         {activeTab === "articoli" && <AdminPostList initialPosts={posts} />}
 
         {activeTab === "strumenti" && (
@@ -121,10 +128,11 @@ export function AdminDashboardTabs({
 
         {activeTab === "statistiche" && (
           <AdminDownloadAnalytics
-            analytics={analytics}
+            rawDownloads={rawDownloads}
             resources={resources}
-            selectedDays={selectedDays}
-            selectedResourceId={selectedResourceId}
+            tablesReady={resourcesTablesReady && downloadsTablesReady}
+            initialDays={initialDays}
+            initialResourceId={initialResourceId}
           />
         )}
       </div>

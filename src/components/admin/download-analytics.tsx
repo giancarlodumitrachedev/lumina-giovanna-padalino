@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useRouter } from "next/navigation";
 import {
   DBResource,
-  DownloadAnalyticsSummary,
+  ResourceDownloadRecord,
   getDownloaderRoleShortLabel,
 } from "@/lib/resources-data";
+import { computeDownloadAnalytics } from "@/lib/resources-analytics";
 import {
   Download,
   Users,
@@ -23,10 +23,11 @@ import {
 } from "lucide-react";
 
 interface AdminDownloadAnalyticsProps {
-  analytics: DownloadAnalyticsSummary;
+  rawDownloads: ResourceDownloadRecord[];
   resources: DBResource[];
-  selectedDays: "7" | "30" | "all";
-  selectedResourceId: string;
+  tablesReady: boolean;
+  initialDays: "7" | "30" | "all";
+  initialResourceId: string;
 }
 
 const ROLE_BADGE_STYLES: Record<string, string> = {
@@ -38,22 +39,45 @@ const ROLE_BADGE_STYLES: Record<string, string> = {
 };
 
 export function AdminDownloadAnalytics({
-  analytics,
+  rawDownloads,
   resources,
-  selectedDays,
-  selectedResourceId,
+  tablesReady,
+  initialDays,
+  initialResourceId,
 }: AdminDownloadAnalyticsProps) {
-  const router = useRouter();
+  const [selectedDays, setSelectedDays] = useState<"7" | "30" | "all">(
+    initialDays
+  );
+  const [selectedResourceId, setSelectedResourceId] =
+    useState<string>(initialResourceId);
   const [logSearch, setLogSearch] = useState("");
 
-  const updateFilter = (nextDays: string, nextResourceId: string) => {
-    const params = new URLSearchParams();
-    params.set("tab", "statistiche");
-    params.set("days", nextDays);
-    if (nextResourceId && nextResourceId !== "all") {
-      params.set("resourceId", nextResourceId);
+  // Aggregazione istantanea (0ms) al cambio di periodo o strumento, senza ricaricare la pagina
+  const analytics = useMemo(() => {
+    const daysValue: number | "all" =
+      selectedDays === "all" ? "all" : Number(selectedDays);
+    return computeDownloadAnalytics(rawDownloads, resources, {
+      days: daysValue,
+      resourceId: selectedResourceId,
+      tablesReady,
+    });
+  }, [rawDownloads, resources, selectedDays, selectedResourceId, tablesReady]);
+
+  const updateFilter = (nextDays: "7" | "30" | "all", nextResourceId: string) => {
+    setSelectedDays(nextDays);
+    setSelectedResourceId(nextResourceId);
+
+    if (typeof window !== "undefined") {
+      const url = new URL(window.location.href);
+      url.searchParams.set("tab", "statistiche");
+      url.searchParams.set("days", nextDays);
+      if (nextResourceId && nextResourceId !== "all") {
+        url.searchParams.set("resourceId", nextResourceId);
+      } else {
+        url.searchParams.delete("resourceId");
+      }
+      window.history.replaceState(null, "", url.pathname + url.search);
     }
-    router.push(`/admin?${params.toString()}`);
   };
 
   const maxDailyCount = useMemo(() => {
@@ -118,7 +142,7 @@ export function AdminDownloadAnalytics({
               key={period.value}
               type="button"
               onClick={() => updateFilter(period.value, selectedResourceId)}
-              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors ${
                 selectedDays === period.value
                   ? "bg-[#C85A32] text-white shadow-2xs"
                   : "bg-[#FAF6F0] text-[#5C4436] border border-[#DFCEBA] hover:bg-[#EADBCB]/60"
@@ -280,7 +304,6 @@ export function AdminDownloadAnalytics({
 
       {/* Distribuzione Ruoli + Provenienza & Dispositivi */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Chi ha scaricato */}
         <div className="bg-white/95 p-5 sm:p-6 rounded-2xl border border-[#DFCEBA] shadow-xs space-y-4">
           <div>
             <h3 className="font-heading font-bold text-lg text-[#2C1E16]">
@@ -324,7 +347,6 @@ export function AdminDownloadAnalytics({
           </div>
         </div>
 
-        {/* Provenienza, Dispositivi & Città */}
         <div className="bg-white/95 p-5 sm:p-6 rounded-2xl border border-[#DFCEBA] shadow-xs space-y-5">
           <div>
             <h3 className="font-heading font-bold text-lg text-[#2C1E16]">
@@ -362,7 +384,6 @@ export function AdminDownloadAnalytics({
             </div>
           )}
 
-          {/* Dispositivi + Città */}
           <div className="pt-3 border-t border-[#F0E4D5] grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <span className="text-[11px] font-semibold uppercase tracking-wider text-[#8C6D58] block mb-2">
@@ -427,7 +448,7 @@ export function AdminDownloadAnalytics({
         </div>
       </div>
 
-      {/* Registro Download Recenti (Tabella Responsive con Container Query) */}
+      {/* Registro Download Recenti */}
       <div className="bg-white/95 rounded-2xl border border-[#DFCEBA] shadow-xs overflow-hidden">
         <div className="p-5 sm:p-6 border-b border-[#EFE4D6] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
@@ -468,22 +489,40 @@ export function AdminDownloadAnalytics({
             <table className="analytics-table text-left text-xs">
               <thead>
                 <tr className="bg-[#FAF6F0] text-[#735948] uppercase tracking-wider text-[10.5px]">
-                  <th scope="col" className="px-5 py-3.5 border-b border-[#EFE4D6] font-semibold">
+                  <th
+                    scope="col"
+                    className="px-5 py-3.5 border-b border-[#EFE4D6] font-semibold"
+                  >
                     Data e ora
                   </th>
-                  <th scope="col" className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold">
+                  <th
+                    scope="col"
+                    className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold"
+                  >
                     Strumento
                   </th>
-                  <th scope="col" className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold">
+                  <th
+                    scope="col"
+                    className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold"
+                  >
                     Profilo
                   </th>
-                  <th scope="col" className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold">
+                  <th
+                    scope="col"
+                    className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold"
+                  >
                     Email
                   </th>
-                  <th scope="col" className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold">
+                  <th
+                    scope="col"
+                    className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold"
+                  >
                     Provenienza
                   </th>
-                  <th scope="col" className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold">
+                  <th
+                    scope="col"
+                    className="px-4 py-3.5 border-b border-[#EFE4D6] font-semibold"
+                  >
                     Dispositivo / Area
                   </th>
                 </tr>

@@ -2,7 +2,7 @@
 
 import { createServerClient } from "@/lib/supabase/server";
 import { verifyAdminSession } from "@/app/actions/admin-blog";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 const BUCKET_NAME = "clinical-resources";
 const MAX_FILE_SIZE_BYTES = 15 * 1024 * 1024; // 15 MB
@@ -178,6 +178,30 @@ export async function saveResourceAction(
     };
   }
 
+  // Validazione origine URL file (solo asset locali o bucket clinical-resources del progetto)
+  const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
+  const isValidUrl = (url: string) =>
+    url.startsWith("/Assets/") ||
+    Boolean(
+      supabaseOrigin &&
+        url.startsWith(
+          `${supabaseOrigin}/storage/v1/object/public/clinical-resources/`
+        )
+    );
+
+  if (!isValidUrl(file_url)) {
+    return {
+      success: false,
+      error: "Origine del file non consentita.",
+    };
+  }
+  if (preview_image_url && !isValidUrl(preview_image_url)) {
+    return {
+      success: false,
+      error: "Origine dell'immagine di anteprima non consentita.",
+    };
+  }
+
   const slug = formData.get("slug")?.toString().trim() || slugify(title);
 
   const payload = {
@@ -226,6 +250,7 @@ export async function saveResourceAction(
       }
     }
 
+    revalidateTag("resources", { expire: 0 });
     revalidatePath("/blog");
     revalidatePath("/admin");
 
@@ -259,6 +284,7 @@ export async function deleteResourceAction(id: string) {
       return { success: false, error: error.message };
     }
 
+    revalidateTag("resources", { expire: 0 });
     revalidatePath("/blog");
     revalidatePath("/admin");
 

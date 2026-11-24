@@ -1,3 +1,4 @@
+import { unstable_cache } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 import { blogPosts, BlogPost } from "@/lib/blog-data";
 
@@ -45,32 +46,49 @@ function mapDBPostToBlogPost(dbPost: DBPost): BlogPost {
   };
 }
 
+const fetchPublishedPostsCached = unstable_cache(
+  async (): Promise<BlogPost[]> => {
+    try {
+      const supabase = createServerClient();
+      const { data, error } = await supabase
+        .from("posts")
+        .select("*")
+        .eq("is_published", true)
+        .order("published_at", { ascending: false });
+
+      if (!error && data && data.length > 0) {
+        return data.map(mapDBPostToBlogPost);
+      }
+    } catch (err) {
+      console.warn(
+        "Supabase fetch warning, usando dati statici di fallback:",
+        err
+      );
+    }
+
+    return blogPosts;
+  },
+  ["published-posts"],
+  { revalidate: 60, tags: ["posts"] }
+);
+
 /**
- * Ottiene tutti i post pubblicati da Supabase con fallback trasparente sui dati statici
+ * Ottiene tutti i post pubblicati (cache 60s con invalidazione immediata da /admin)
  */
 export async function getPublishedPosts(): Promise<BlogPost[]> {
-  try {
-    const supabase = createServerClient();
-    const { data, error } = await supabase
-      .from("posts")
-      .select("*")
-      .eq("is_published", true)
-      .order("published_at", { ascending: false });
-
-    if (!error && data && data.length > 0) {
-      return data.map(mapDBPostToBlogPost);
-    }
-  } catch (err) {
-    console.warn("Supabase fetch warning, usando dati statici di fallback:", err);
-  }
-
-  return blogPosts;
+  return fetchPublishedPostsCached();
 }
 
 /**
- * Ottiene un singolo articolo per slug da Supabase o dal fallback
+ * Ottiene un singolo articolo per slug (riusa la cache dei post pubblicati prima di colpire il DB)
  */
-export async function getPostBySlug(slug: string): Promise<BlogPost | undefined> {
+export async function getPostBySlug(
+  slug: string
+): Promise<BlogPost | undefined> {
+  const posts = await fetchPublishedPostsCached();
+  const match = posts.find((p) => p.slug === slug);
+  if (match) return match;
+
   try {
     const supabase = createServerClient();
     const { data, error } = await supabase
@@ -84,7 +102,10 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | undefined>
       return mapDBPostToBlogPost(data);
     }
   } catch (err) {
-    console.warn("Supabase post by slug warning, cercando nei dati statici:", err);
+    console.warn(
+      "Supabase post by slug warning, cercando nei dati statici:",
+      err
+    );
   }
 
   return blogPosts.find((p) => p.slug === slug);
@@ -108,7 +129,6 @@ export async function getAllPostsAdmin(): Promise<DBPost[]> {
     console.warn("Supabase admin fetch warning:", err);
   }
 
-  // Fallback se la tabella non è ancora stata creata
   return blogPosts.map((p, idx) => ({
     id: `static-${idx}`,
     title: p.title,

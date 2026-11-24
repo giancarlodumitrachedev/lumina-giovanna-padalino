@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { createServerClient } from "@/lib/supabase/server";
 import { getPublishedResourceById } from "@/lib/resources-service";
+import { checkRateLimit } from "@/lib/admin-auth";
 
 const downloadPayloadSchema = z.object({
   role: z.enum(["collega", "insegnante", "genitore", "personale", "altro"]),
@@ -71,6 +72,18 @@ export async function POST(
   request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const clientIp =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip")?.trim() ||
+    "unknown";
+  const rate = checkRateLimit(`download:${clientIp}`, 30, 10 * 60 * 1000);
+  if (!rate.allowed) {
+    return NextResponse.json(
+      { success: false, error: "Troppe richieste ravvicinate. Riprova tra qualche minuto." },
+      { status: 429, headers: { "Retry-After": String(rate.retryAfterSeconds) } }
+    );
+  }
+
   const { id } = await context.params;
   const resource = await getPublishedResourceById(id);
 

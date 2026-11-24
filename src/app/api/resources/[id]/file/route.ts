@@ -53,7 +53,21 @@ export async function GET(
     }
   }
 
-  // Caso 2: file remoto su Supabase Storage
+  // Caso 2: file remoto esclusivamente dallo Storage Supabase del progetto (previene SSRF)
+  const supabaseOrigin = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, "");
+  const isAllowedRemote =
+    supabaseOrigin &&
+    resource.fileUrl.startsWith(
+      `${supabaseOrigin}/storage/v1/object/public/clinical-resources/`
+    );
+
+  if (!isAllowedRemote) {
+    return NextResponse.json(
+      { error: "Origine file non autorizzata." },
+      { status: 403 }
+    );
+  }
+
   try {
     const remoteRes = await fetch(resource.fileUrl, { cache: "no-store" });
     if (!remoteRes.ok) {
