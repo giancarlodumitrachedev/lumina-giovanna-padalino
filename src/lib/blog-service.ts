@@ -10,6 +10,7 @@ export interface DBPost {
   category: BlogPost["category"];
   read_time?: string;
   cover_image?: string;
+  attached_resource_id?: string | null;
   is_published: boolean;
   published_at: string;
   created_at?: string;
@@ -40,6 +41,7 @@ function mapDBPostToBlogPost(dbPost: DBPost): BlogPost {
     author: "Dott.ssa Giovanna Padalino",
     content: dbPost.content,
     image: dbPost.cover_image,
+    attachedResourceId: dbPost.attached_resource_id ?? null,
   };
 }
 

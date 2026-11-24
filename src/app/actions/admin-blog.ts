@@ -110,6 +110,8 @@ export async function savePostAction(prevState: any, formData: FormData) {
   const category = formData.get("category")?.toString().trim();
   const read_time = formData.get("read_time")?.toString().trim() || "5 min di lettura";
   const cover_image = formData.get("cover_image")?.toString().trim() || null;
+  const attached_resource_id =
+    formData.get("attached_resource_id")?.toString().trim() || null;
   const is_published = formData.get("is_published") === "true" || formData.get("is_published") === "on";
 
   if (!title || !excerpt || !content || !category) {
@@ -118,7 +120,7 @@ export async function savePostAction(prevState: any, formData: FormData) {
 
   const slug = formData.get("slug")?.toString().trim() || slugify(title);
 
-  const postPayload = {
+  const basePostPayload = {
     title,
     slug,
     excerpt,
@@ -130,28 +132,54 @@ export async function savePostAction(prevState: any, formData: FormData) {
     updated_at: new Date().toISOString(),
   };
 
+  const postPayload = {
+    ...basePostPayload,
+    attached_resource_id,
+  };
+
   try {
     const supabase = createServerClient();
 
     if (id && !id.startsWith("static-")) {
       // Aggiornamento
-      const { error } = await supabase
+      let { error } = await supabase
         .from("posts")
         .update(postPayload)
         .eq("id", id);
+
+      // Fallback trasparente se la colonna attached_resource_id non è ancora stata migrata
+      if (error && error.message?.includes("attached_resource_id")) {
+        const retry = await supabase
+          .from("posts")
+          .update(basePostPayload)
+          .eq("id", id);
+        error = retry.error;
+      }
 
       if (error) {
         return { success: false, error: `Errore durante l'aggiornamento: ${error.message}` };
       }
     } else {
       // Creazione
-      const { error } = await supabase
+      const nowIso = new Date().toISOString();
+      let { error } = await supabase
         .from("posts")
         .insert({
           ...postPayload,
-          published_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
+          published_at: nowIso,
+          created_at: nowIso,
         });
+
+      if (error && error.message?.includes("attached_resource_id")) {
+        const retry = await supabase
+          .from("posts")
+          .insert({
+            ...basePostPayload,
+            published_at: nowIso,
+            created_at: nowIso,
+          });
+        error = retry.error;
+      }
 
       if (error) {
         return { success: false, error: `Errore durante il salvataggio: ${error.message}` };

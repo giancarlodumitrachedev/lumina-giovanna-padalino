@@ -71,3 +71,12 @@ Sezione manifesto valoriale inserita sia in **Homepage** sia nella pagina **"Chi
 ## 7. Landing Page & Aree di Competenza
 - Titolo Hero: "Uno spazio accogliente per ascoltarsi e ritrovarsi" in proporzioni armoniose e leggermente più compatto.
 - Disturbi evolutivi specifici (ADHD, DSA), scuola e neurodivergenze.
+
+---
+
+## 8. Sezione "Strumenti & Schede" nel Blog & Dashboard Statistiche Download
+- **Integrazione in `/blog`:** Parte integrante della pagina Blog (nessuna voce separata nel menu di navigazione), tramite selettore editoriale `Articoli` / `Strumenti & Schede` (`?sezione=strumenti`) e richiamo discreto nella vista articoli.
+- **Collegamento agli articoli:** Possibilità di allegare uno strumento scaricabile a uno specifico articolo del blog (`/blog/[slug]`) con box editoriale dedicato.
+- **Primo strumento ufficiale:** *"La Mia Mappa Emotiva"* (`pdf1.pdf`), salvato in `public/Assets/strumenti/la-mia-mappa-emotiva.pdf` con anteprima visiva reale in `public/Assets/strumenti/la-mia-mappa-emotiva-preview.png` (o `.webp`).
+- **Download & Tracking privacy-safe:** Micro-modale leggero prima del download che chiede in 1 tap il ruolo (`Collega / Professionista`, `Insegnante / Scuola`, `Genitore / Famiglia`, `Uso personale`, `Altro`) + email facoltativa con consenso privacy esplicito; tracciamento server-side di ruolo, sorgente (catalogo o articolo), referrer, dispositivo e città/paese da Vercel senza memorizzare indirizzi IP.
+- **Gestione & Dashboard riservata (`/admin`):** Integrata nel Portale Medico protetto da login (`/admin`), con 3 tab (`Articoli Blog`, `Strumenti & Schede`, `Statistiche Download`), upload autonomo di PDF e immagini fino a 15 MB tramite Supabase Signed Upload URL ed export CSV.

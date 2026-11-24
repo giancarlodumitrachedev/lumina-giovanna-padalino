@@ -8,6 +8,7 @@ export interface BlogPost {
   readTime: string;
   author: string;
   image?: string;
+  attachedResourceId?: string | null;
 }
 
 export const blogCategories = [

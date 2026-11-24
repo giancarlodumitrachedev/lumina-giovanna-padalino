@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { getPostBySlug, getPublishedPosts } from "@/lib/blog-service";
+import { getPublishedResourceById } from "@/lib/resources-service";
+import { ArticleResourceBox } from "@/components/blog/article-resource-box";
 import { SmartLink } from "@/components/smart-link";
 import { ArrowLeft, Clock, Calendar, MessageCircle, Calendar as CalendarIcon, Sparkles } from "lucide-react";
 import { InstagramIcon } from "@/components/icons/instagram-icon";
@@ -44,7 +46,12 @@ export default async function BlogPostPage({ params }: Props) {
     notFound();
   }
 
-  const allPosts = await getPublishedPosts();
+  const [allPosts, attachedResource] = await Promise.all([
+    getPublishedPosts(),
+    post.attachedResourceId
+      ? getPublishedResourceById(post.attachedResourceId)
+      : Promise.resolve(null),
+  ]);
   const relatedPosts = allPosts
     .filter((p) => p.slug !== post.slug)
     .slice(0, 2);
@@ -139,6 +146,11 @@ export default async function BlogPostPage({ params }: Props) {
             className="blog-rich-content"
             dangerouslySetInnerHTML={{ __html: parseBlogContentToHtml(post.content) }}
           />
+
+          {/* Eventuale Strumento Scaricabile Collegato */}
+          {attachedResource && (
+            <ArticleResourceBox resource={attachedResource} postSlug={post.slug} />
+          )}
 
           {/* Kintsugi Gold Divider */}
           <div className="pt-8 mt-8 border-t border-[#DFCEBA]/40">

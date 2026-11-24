@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { savePostAction, uploadCoverImageAction } from "@/app/actions/admin-blog";
 import { DBPost } from "@/lib/blog-service";
+import { DBResource } from "@/lib/resources-data";
 import { SmartLink } from "@/components/smart-link";
 import {
   ArrowLeft,
@@ -30,7 +31,13 @@ const categories = [
   "Psicologia e benessere",
 ] as const;
 
-export function AdminPostEditor({ post }: { post?: DBPost | null }) {
+export function AdminPostEditor({
+  post,
+  availableResources = [],
+}: {
+  post?: DBPost | null;
+  availableResources?: DBResource[];
+}) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(savePostAction, null);
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
@@ -43,6 +50,9 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
     post?.read_time || calculateReadingTime(post?.content || "").text
   );
   const [coverImage, setCoverImage] = useState<string>(post?.cover_image || "");
+  const [attachedResourceId, setAttachedResourceId] = useState<string>(
+    post?.attached_resource_id || ""
+  );
   const [isPublished, setIsPublished] = useState(post ? post.is_published : true);
 
   // Stati upload immagine su Supabase Storage
@@ -346,6 +356,31 @@ export function AdminPostEditor({ post }: { post?: DBPost | null }) {
                 onChange={handleContentChange}
                 name="content"
               />
+            </div>
+
+            {/* Strumento Scaricabile Collegato (opzionale) */}
+            <div className="pt-4 border-t border-[#F0E4D5]">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-[#2C1E16]">
+                  Strumento Scaricabile Collegato (opzionale)
+                </label>
+                <span className="text-[11px] text-[#8C6D58]">
+                  Apparirà come box scaricabile alla fine dell&apos;articolo
+                </span>
+              </div>
+              <select
+                name="attached_resource_id"
+                value={attachedResourceId}
+                onChange={(e) => setAttachedResourceId(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-[#FAF6F0] border border-[#DFCEBA] rounded-xl text-xs sm:text-sm text-[#2C1E16] font-medium focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#C85A32]/30"
+              >
+                <option value="">Nessuno strumento allegato</option>
+                {availableResources.map((res) => (
+                  <option key={res.id} value={res.id}>
+                    {res.title} ({res.file_type === "pdf" ? "PDF" : "Immagine"})
+                  </option>
+                ))}
+              </select>
             </div>
 
             {/* Stato di Pubblicazione */}

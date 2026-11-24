@@ -31,6 +31,9 @@ export default async function PrivacyPage({
           I Dati Personali raccolti da questo sito, in modo autonomo o tramite terze parti, includono:
           Nome, Email, Numero di Telefono e qualsiasi altra informazione fornita volontariamente tramite il modulo di contatto per la prenotazione di un consulto in ambito di {params.fieldDisplay.toLowerCase()}.
         </p>
+        <p className="mt-3">
+          In occasione del download gratuito di strumenti e schede nella sezione Blog (&ldquo;Strumenti &amp; Schede&rdquo;), vengono raccolti esclusivamente: la categoria di utilizzo selezionata dall&apos;utente in forma aggregata (es. collega, insegnante, genitore, uso personale), dati statistici tecnici anonimi (dispositivo, pagina di provenienza e area geografica generica, senza memorizzazione dell&apos;indirizzo IP) e, solo se inserita volontariamente con esplicito consenso, l&apos;indirizzo email per eventuali aggiornamenti su nuovi materiali gratuiti.
+        </p>
 
         <h2 className="text-2xl font-semibold text-foreground mt-8 mb-4">3. Finalità del Trattamento</h2>
         <p>
