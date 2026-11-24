@@ -4,6 +4,7 @@ import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 import { UiEnhancements } from "@/components/ui-enhancements";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -82,6 +83,7 @@ export default function RootLayout({
         </main>
         <UiEnhancements />
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
